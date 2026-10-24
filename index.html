@@ -730,6 +730,17 @@ body{font-weight:400;letter-spacing:-.012em;background:var(--bg)}
 .hero-ph{margin-right:0!important}
 .room .fcol{align-self:end}.room .fcol .btn{min-height:48px;height:auto;flex:none}
 @media (max-width:720px){.hero .ctas .btn{flex:0 0 auto}.hero-ph{margin-right:calc(var(--gut)*-1)!important}}
+
+/* 둥근 사진·지도 */
+:root{--rp:22px}
+.hero-ph{border-radius:28px!important;overflow:hidden!important}
+.room .ph,.fcard .ph,.phb,.ph{border-radius:var(--rp)!important;overflow:hidden}
+.map,.mapcol .map,.minimap{border-radius:var(--rp)!important;overflow:hidden}
+.map-peek,.peek{border-radius:18px!important;overflow:hidden}
+.map-peek img,.peek img{border-radius:12px!important}
+.gal img{border-radius:var(--rp)!important}
+.rcard img,.note img,.notes img{border-radius:16px!important}
+@media (max-width:720px){.hero-ph{border-radius:24px!important;margin-right:0!important;margin-left:0!important}:root{--rp:18px}}
 </style>
 </head>
 <body>
