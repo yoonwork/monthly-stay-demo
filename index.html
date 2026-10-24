@@ -711,10 +711,29 @@ body{font-weight:400;letter-spacing:-.012em;background:var(--bg)}
  .vband{min-height:560px}.vband .vin{padding:56px 24px}.vband h2{font-size:57px}.vband::before{background:linear-gradient(0deg,rgba(20,14,12,.82),rgba(20,14,12,.1))}.notes{padding:88px 0}.notes .track{grid-auto-columns:88cqw}.note{grid-template-columns:1fr}.note>img{height:240px}.note blockquote{font-size:21px}.endcta{padding:100px 0}.endcta h2{font-size:62px}
  .gal{margin:0 calc(var(--gut)*-1)}.gal img,.gal img:first-child{border-radius:0;height:390px}.det h1,.phead h1,.host-head h1,.sys h1{font-size:54px}.book{padding:24px 0}.trip{grid-template-columns:1fr}.trip>img{height:250px}.host-head{padding-top:36px}.kpis{overflow-x:auto}.kpis div{min-width:110px;padding:13px}.kpis b{font-size:34px}.htabs{border-radius:0}.panel{border-radius:0}.prow,.rrow{padding:18px 0}.sys{padding-top:38px}.sys h2{font-size:33px;margin-top:76px}.ly{padding:18px 0}.ly.core{padding:22px 18px}.trace{border-radius:0}.sheet{border-radius:0}.foot .wm{font-size:74px}
 }
+
+/* 단순화 */
+.demo-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px max(16px,var(--gut));font-size:12px;letter-spacing:0;text-align:left}
+.db-r{display:flex;align-items:center;gap:8px}.db-l{opacity:.6;font-size:11.5px}
+.demo-bar .seg.role{display:flex;gap:2px;background:transparent;border:0;padding:0}
+.demo-bar .seg.role button{background:transparent;color:#CFC6BC;border:0;border-radius:999px;font-size:12px;min-height:30px;padding:0 12px;font-weight:600}
+.demo-bar .seg.role button[aria-pressed=true]{background:#F3EFE9;color:var(--espresso)}
+.hero-top,.hero-ph .star,.hero-ph .cap,.has{display:none!important}
+.hero p::before,.hero-l p::before{content:none!important;display:none!important}
+.room .bi,.room .info,.room .ft,.room .ttl .more{display:none!important}
+.trace-btn{padding:0;width:44px;justify-content:center}
+@media (max-width:720px){.demo-bar{padding:6px 12px}.db-l{display:none}.demo-bar .seg.role button{padding:0 10px;min-height:32px}
+ .top-in{flex-wrap:nowrap!important}}
+
+.hero p,.hero .ctas,.ctas{padding-left:0!important}
+.top .lang{margin-left:auto}
+.hero-ph{margin-right:0!important}
+.room .fcol{align-self:end}.room .fcol .btn{min-height:48px;height:auto;flex:none}
+@media (max-width:720px){.hero .ctas .btn{flex:0 0 auto}.hero-ph{margin-right:calc(var(--gut)*-1)!important}}
 </style>
 </head>
 <body>
-<div class="demo-bar"><b>제안용 데모 · 예시</b><span class="long"> — 숙소·호스트·게스트·결제는 모두 가상이에요.</span> 실제 결제는 일어나지 않아요. <span lang="en">Proposal demo · all listings and payments are fictional.</span></div>
+<div class="demo-bar"><span class="db-t"><b>제안용 데모</b><span class="long"> · 가상 숙소, 실제 결제 없음</span></span><span class="db-r" id="rolebar"></span></div>
 <header class="top"><div class="top-in" id="top"></div></header>
 <main id="app"></main>
 <footer class="foot"><div class="wm" aria-hidden="true">stayfold</div><div class="wrap" id="foot"></div></footer>
@@ -973,10 +992,10 @@ const kst=ms=>{const d=new Date(ms);return `${iso(d)} ${String(d.getHours()).pad
 function renderTop(){
  const role=[['guest',t('guest')],['host',t('host')],['sys',t('sys')]].map(([k,v])=>`<button data-act="role" data-v="${k}" aria-pressed="${S.role===k}">${v}</button>`).join('');
  document.getElementById('top').innerHTML=`
- <button class="logo" data-act="home" aria-label="Stayfold Seoul"><i><svg viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M25 18h34c8 0 14 6 14 14v35c0 6-5 11-11 11H36c-7 0-13-6-13-13V29c0-6 5-11 11-11"/><path d="M25 55c10 0 17 2 23 7 7 6 14 8 24 6"/><path d="M60 18v17c0 5 4 9 9 9h4"/></g><circle cx="31" cy="27" r="3.4" fill="currentColor"/></svg></i>Stayfold<small>Seoul monthly rooms</small></button>
- <span class="seg-lbl">${S.lang==='ko'?'데모 보기 전환':'Demo view'}</span><div class="seg role" role="group" aria-label="${S.lang==='ko'?'데모 보기 전환':'Demo view'}">${role}</div>
- <div class="lang" role="group" aria-label="language"><button data-act="lang" data-v="ko" aria-pressed="${S.lang==='ko'}">KO</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==='en'}">EN</button></div>
- <button class="trace-btn" data-act="trace" aria-label="${t('trace')}">${ic.term}<span class="lbl">${t('trace')}</span><span class="cnt">${DB.unseen||''}</span></button>`;
+ <button class="logo" data-act="home" aria-label="Stayfold Seoul"><i><svg viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M25 18h34c8 0 14 6 14 14v35c0 6-5 11-11 11H36c-7 0-13-6-13-13V29c0-6 5-11 11-11"/><path d="M25 55c10 0 17 2 23 7 7 6 14 8 24 6"/><path d="M60 18v17c0 5 4 9 9 9h4"/></g><circle cx="31" cy="27" r="3.4" fill="currentColor"/></svg></i>Stayfold</button>
+  <div class="lang" role="group" aria-label="language"><button data-act="lang" data-v="ko" aria-pressed="${S.lang==='ko'}">KO</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==='en'}">EN</button></div>
+ <button class="trace-btn" data-act="trace" aria-label="${t('trace')}">${ic.term}<span class="cnt">${DB.unseen||''}</span></button>`;
+ document.getElementById('rolebar').innerHTML=`<span class="db-l">${S.lang==='ko'?'화면 보기':'View as'}</span><div class="seg role" role="group" aria-label="${S.lang==='ko'?'데모 화면 전환':'Demo view'}">${role}</div>`;
  document.getElementById('foot').innerHTML=`<span>${t('credit')} · Stayfold Seoul은 제안용 가상 브랜드예요.</span><button class="link" data-act="reset">${t('resetDemo')}</button>`;
  document.documentElement.lang=S.lang;
 }
@@ -1071,7 +1090,7 @@ function vSearch(){
  <div class="herox"><section class="hero"><div class="hero-l"><div class="hero-top"><span class="eb"><i></i>${t('heroEb')}</span>
    <div class="rate"><b>${ic.starF}${avg}</b>${t('rateT')}</div></div>
    <div><h1>${t('heroH')}</h1><p>${t('heroP')}</p>
-   <div class="ctas"><button class="btn" data-act="search"><span class="dt"></span>${t('ctaBrowse')}</button><button class="btn grey" data-act="role" data-v="sys">${t('ctaHow')}</button></div></div></div>
+   <div class="ctas"><button class="btn" data-act="search"><span class="dt"></span>${t('ctaBrowse')}</button></div></div></div>
   <div class="hero-ph"><img src="${U(P.hb).replace('w=900','w=1200')}" alt="${S.lang==='ko'?'원목 침대와 베이지 리넨이 있는 밝은 방':'Bright room with an oak bed and beige linen'}"><span class="star" title="${t('rateT')}">${ic.starF}4.9</span><div class="cap"><span><b>${t('heroCapT')}</b>${t('heroCapS')}</span></div></div>
  </section>
  <form class="search" data-form="search" onsubmit="return false">
