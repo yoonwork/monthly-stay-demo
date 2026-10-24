@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">Stayfold quiet point mark</title>
+  <g fill="none" stroke="#2A1D1A" stroke-width="2.4" stroke-linecap="round">
+    <path d="M48 18v19M48 59v19M18 48h19M59 48h19"/>
+    <path d="M27 27l13.5 13.5M55.5 55.5L69 69M69 27L55.5 40.5M40.5 55.5L27 69" opacity=".42"/>
+  </g>
+  <circle cx="48" cy="48" r="5.5" fill="#2A1D1A"/>
+</svg>

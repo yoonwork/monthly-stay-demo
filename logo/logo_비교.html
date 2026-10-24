@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Stayfold Seoul — Logo Directions</title>
+  <style>
+    :root{--cream:#F3F0EB;--paper:#FFF;--espresso:#2A1D1A;--burgundy:#4A2A26;--muted:#776B65}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--espresso);font-family:Pretendard,Inter,"Helvetica Neue",Arial,sans-serif}
+    .wrap{width:min(1440px,calc(100% - 48px));margin:auto;padding:64px 0 96px}
+    header{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:42px}
+    .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--burgundy)}
+    h1{font-size:clamp(44px,7vw,92px);line-height:.93;letter-spacing:-.055em;font-weight:260;margin:16px 0 0}
+    header p{max-width:360px;color:var(--muted);line-height:1.65;font-size:14px;margin:0}
+    .tabs{display:flex;gap:8px;margin:0 0 18px}.tab{border:1px solid rgba(42,29,26,.15);background:transparent;border-radius:999px;padding:9px 14px;font:inherit;font-size:12px;color:inherit;cursor:pointer}.tab.active{background:var(--espresso);color:var(--cream)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .card{background:var(--paper);border:1px solid rgba(42,29,26,.08);border-radius:24px;padding:26px;box-shadow:0 16px 44px rgba(42,29,26,.045);min-width:0}
+    .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.letter{font:400 24px/1 'Iowan Old Style',Palatino,serif}.tag{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+    .stage{height:210px;border-radius:15px;background:var(--sample-bg,#fff);display:grid;place-items:center;padding:30px;transition:.25s}.horizontal{display:block;width:min(100%,520px);height:auto}.cream{--sample-bg:var(--cream)}.white{--sample-bg:#fff}.dark{--sample-bg:var(--espresso)}.dark .stage img,.dark .header-sample img,.dark .favicon img{filter:invert(94%) sepia(8%) saturate(223%) hue-rotate(338deg) brightness(104%)}
+    .sizes{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin-top:22px}.sample{min-width:0}.label{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}.header-sample{height:52px;padding:0 10px;background:var(--sample-bg);border-radius:8px;display:flex;align-items:center;overflow:hidden;transition:.25s}.header-sample img{width:auto;height:32px;max-width:100%}.favicon{width:54px;height:54px;display:grid;place-items:center;background:var(--sample-bg);border-radius:13px;transition:.25s}.favicon img{width:32px;height:32px}.note{font-size:12px;color:var(--muted);margin:20px 2px 0;line-height:1.55}
+    footer{margin-top:24px;padding:24px 4px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.08em}
+    @media(max-width:850px){.wrap{width:min(100% - 28px,680px);padding-top:36px}header{display:block}header p{margin-top:22px}.grid{grid-template-columns:1fr}.stage{height:170px}.card{padding:18px}}
+  </style>
+</head>
+<body class="cream">
+  <main class="wrap">
+    <header><div><div class="eyebrow">Logo study · 01—04</div><h1>Stayfold<br>Seoul</h1></div><p>서울에서의 한 달이 낯선 여행이 아니라 잠시 접어 둔 일상의 한 페이지처럼 느껴지도록. 네 가지 시각 언어를 비교합니다.</p></header>
+    <nav class="tabs" aria-label="배경색 선택"><button class="tab active" data-theme="cream">미색</button><button class="tab" data-theme="white">흰색</button><button class="tab" data-theme="dark">에스프레소</button></nav>
+    <section class="grid">
+      <article class="card"><div class="card-top"><span class="letter">A</span><span class="tag">Soft Fold · Recommended</span></div><div class="stage"><img class="horizontal" src="logo_A_horizontal.svg" alt="A안 가로형"></div><div class="sizes"><div class="sample"><span class="label">Header · 32px</span><div class="header-sample"><img src="logo_A_horizontal.svg" alt=""></div></div><div><span class="label">Favicon</span><div class="favicon"><img src="logo_A_mark.svg" alt="A안 심볼"></div></div></div><p class="note">접힌 린넨의 결 — 부드럽고 고유하며 이름과 바로 연결됩니다.</p></article>
+      <article class="card"><div class="card-top"><span class="letter">B</span><span class="tag">Quiet Point</span></div><div class="stage"><img class="horizontal" src="logo_B_horizontal.svg" alt="B안 가로형"></div><div class="sizes"><div class="sample"><span class="label">Header · 32px</span><div class="header-sample"><img src="logo_B_horizontal.svg" alt=""></div></div><div><span class="label">Favicon</span><div class="favicon"><img src="logo_B_mark.svg" alt="B안 심볼"></div></div></div><p class="note">목적지를 찍는 점 하나 — 가장 조용하고 에디토리얼한 호텔 무드입니다.</p></article>
+      <article class="card"><div class="card-top"><span class="letter">C</span><span class="tag">Connected Stay</span></div><div class="stage"><img class="horizontal" src="logo_C_horizontal.svg" alt="C안 가로형"></div><div class="sizes"><div class="sample"><span class="label">Header · 32px</span><div class="header-sample"><img src="logo_C_horizontal.svg" alt=""></div></div><div><span class="label">Favicon</span><div class="favicon"><img src="logo_C_mark.svg" alt="C안 심볼"></div></div></div><p class="note">S와 F가 머무름처럼 이어지는 모노그램 — 패턴 확장성이 뛰어납니다.</p></article>
+      <article class="card"><div class="card-top"><span class="letter">D</span><span class="tag">Seoul Threshold</span></div><div class="stage"><img class="horizontal" src="logo_D_horizontal.svg" alt="D안 가로형"></div><div class="sizes"><div class="sample"><span class="label">Header · 32px</span><div class="header-sample"><img src="logo_D_horizontal.svg" alt=""></div></div><div><span class="label">Favicon</span><div class="favicon"><img src="logo_D_mark.svg" alt="D안 심볼"></div></div></div><p class="note">서울 생활로 들어가는 문턱 — 건축적이고 차분한 인상을 줍니다.</p></article>
+    </section>
+    <footer><span>STAYFOLD SEOUL · IDENTITY EXPLORATION</span><span>ESPRESSO #2A1D1A · CREAM #F3F0EB</span></footer>
+  </main>
+  <script>
+    const body=document.body,tabs=[...document.querySelectorAll('.tab')];
+    tabs.forEach(tab=>tab.addEventListener('click',()=>{tabs.forEach(t=>t.classList.remove('active'));tab.classList.add('active');body.className=tab.dataset.theme}));
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 120" role="img" aria-labelledby="title desc">
+  <title id="title">Stayfold Seoul — archway logo</title>
+  <desc id="desc">A calm double arch suggesting arrival, passage and a Seoul doorway.</desc>
+  <g transform="translate(14 8)" fill="none" stroke="#2A1D1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 78V45c0-16 11-29 26-29s26 13 26 29v33"/>
+    <path d="M34 78V47c0-9 6-17 14-17s14 8 14 17v31"/>
+    <path d="M16 78h64"/>
+    <circle cx="55" cy="55" r="2.8" fill="#2A1D1A" stroke="none"/>
+  </g>
+  <text x="128" y="68" fill="#2A1D1A" font-family="Pretendard, Inter, 'Helvetica Neue', Arial, sans-serif" font-size="49" font-weight="300" letter-spacing="-2">Stayfold</text>
+  <text x="132" y="91" fill="#2A1D1A" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif" font-size="12" font-style="italic" letter-spacing="4">SEOUL</text>
+</svg>

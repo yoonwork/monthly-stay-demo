@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-labelledby="title desc">
+  <title id="title">Stayfold Seoul — folded linen logo</title>
+  <desc id="desc">An abstract folded linen mark beside a refined sans serif wordmark.</desc>
+  <g transform="translate(17 12)" fill="none" stroke="#2A1D1A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M25 18h34c8 0 14 6 14 14v35c0 6-5 11-11 11H36c-7 0-13-6-13-13V29c0-6 5-11 11-11"/>
+    <path d="M25 55c10 0 17 2 23 7 7 6 14 8 24 6"/>
+    <path d="M60 18v17c0 5 4 9 9 9h4"/>
+    <circle cx="31" cy="27" r="2.2" fill="#2A1D1A" stroke="none"/>
+  </g>
+  <text x="127" y="69" fill="#2A1D1A" font-family="Pretendard, Inter, 'Helvetica Neue', Arial, sans-serif" font-size="48" font-weight="300" letter-spacing="-1.8">Stayfold</text>
+  <text x="131" y="93" fill="#2A1D1A" font-family="Pretendard, Inter, 'Helvetica Neue', Arial, sans-serif" font-size="10.5" font-weight="500" letter-spacing="5.2">SEOUL</text>
+</svg>

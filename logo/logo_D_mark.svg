@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">Stayfold Seoul archway mark</title>
+  <g fill="none" stroke="#2A1D1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 78V45c0-16 11-29 26-29s26 13 26 29v33"/>
+    <path d="M34 78V47c0-9 6-17 14-17s14 8 14 17v31"/>
+    <path d="M16 78h64"/>
+  </g>
+  <circle cx="55" cy="55" r="2.8" fill="#2A1D1A"/>
+</svg>

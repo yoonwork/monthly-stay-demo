@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 120" role="img" aria-labelledby="title desc">
+  <title id="title">Stayfold Seoul — editorial wordmark</title>
+  <desc id="desc">An elegant serif wordmark finished with a single quiet point.</desc>
+  <text x="22" y="76" fill="#2A1D1A" font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', serif" font-size="62" font-weight="400" letter-spacing="-2.2">Stayfold</text>
+  <circle cx="270" cy="33" r="4.2" fill="#2A1D1A"/>
+  <path d="M311 35v45" stroke="#2A1D1A" stroke-width="1" opacity=".45"/>
+  <text x="338" y="61" fill="#2A1D1A" font-family="Pretendard, Inter, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="5.5">SEOUL</text>
+  <text x="338" y="80" fill="#2A1D1A" font-family="Pretendard, Inter, 'Helvetica Neue', Arial, sans-serif" font-size="9" font-weight="400" letter-spacing="1.45" opacity=".68">MONTHLY STAYS</text>
+</svg>
