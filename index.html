@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stayfold Seoul — 한 달 살기 방 예약 (제안용 데모)</title>
+<meta name="description" content="외국인 대상 서울 한 달 살기 방 단위 예약 웹 MVP 제안용 데모. 방 검색, 지도, 월할·일할 가격, 호스트 승인 24시간 확보, 카드·PayPal 모의 결제, 환불까지.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23D9365C'/%3E%3Cpath d='M9 21V14l7-5 7 5v7' fill='none' stroke='white' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  color-scheme: light;
+  --brand:#D9365C; --brand-hover:#C22A4F; --brand-press:#A82243; --brand-text:#B4264A;
+  --brand-tint:#FCEDF1; --brand-tint-2:#F8D5DE; --ring:0 0 0 3px rgba(217,54,92,.28); --on-brand:#fff;
+  --bg:#F4F5F1; --card:#FFFFFF; --soft:#F8F9F6; --track:#ECEEE8; --line:#E2E5DF; --line-2:#E9ECE6;
+  --ink:#18201C; --ink-2:#465049; --mut:#5F6A63; --mut-2:#9AA39C;
+  --ok:#127A4F; --ok-bg:#E3F6ED; --ok-dot:#1FA971;
+  --warn:#7A5600; --warn-bg:#FFF3D4; --warn-dot:#F2B01E;
+  --bad:#BF2930; --bad-bg:#FFE3E4; --bad-dot:#E5484D;
+  --info:#175CD3; --info-bg:#EAF2FF; --info-dot:#2E7CF6;
+  --neu:#4E5968; --neu-bg:#EEF0EC; --neu-dot:#8B95A1;
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r-sm:8px; --r-md:12px; --r-card:16px; --r-photo:20px; --r-xl:20px; --r-pill:999px;
+  --sh-pop:0 2px 6px rgba(16,24,20,.06),0 12px 32px rgba(16,24,20,.12);
+  --trace-w:380px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;letter-spacing:-.005em;overflow-x:hidden}
+img{display:block;max-width:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.num{font-variant-numeric:tabular-nums}
+
+/* demo banner */
+.demo-bar{background:var(--ink);color:#fff;font-size:12.5px;padding:7px 16px;text-align:center;line-height:1.4}
+.demo-bar b{font-weight:600;color:#FFD0DB}
+
+/* header */
+.top{position:sticky;top:0;z-index:30;background:rgba(244,245,241,.96);border-bottom:1px solid var(--line-2)}
+.top-in{max-width:1440px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:750;font-size:19px;letter-spacing:-.02em;background:none;border:0;padding:6px 4px;min-height:44px}
+.logo i{width:28px;height:28px;border-radius:9px;background:var(--brand);display:grid;place-items:center}
+.logo small{font-weight:500;color:var(--mut);font-size:13px;margin-left:2px}
+.seg{display:inline-flex;background:var(--track);border-radius:14px;padding:4px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:10px;padding:0 14px;min-height:38px;font-size:14px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(16,24,20,.1)}
+.top .seg-lbl{margin-left:auto;font-size:12.5px;color:var(--mut);font-weight:600}
+.top .seg.role{margin-left:-6px}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.lang button{border:0;background:#fff;min-width:44px;min-height:40px;font-size:13px;font-weight:650;color:var(--mut)}
+.lang button[aria-pressed=true]{background:var(--ink);color:#fff}
+.trace-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:12px;min-height:40px;padding:0 12px;font-size:13.5px;font-weight:600}
+.trace-btn .cnt{background:var(--brand);color:#fff;border-radius:999px;font-size:11.5px;min-width:20px;height:20px;padding:0 6px;display:inline-grid;place-items:center}
+.trace-btn .cnt:empty{display:none}
+
+.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
+main{min-height:70vh;transition:padding-right .2s}
+@media(min-width:1180px){body.trace-open main,body.trace-open .foot,body.trace-open .top,body.trace-open .demo-bar{padding-right:var(--trace-w)}}
+
+/* guest sub nav + search */
+.gnav{display:flex;align-items:center;gap:8px;padding:18px 0 4px}
+.tab{border:0;background:none;min-height:44px;padding:0 4px;margin-right:14px;font-size:15px;font-weight:600;color:var(--mut);border-bottom:2px solid transparent}
+.tab[aria-current=true]{color:var(--ink);border-bottom-color:var(--ink)}
+.tab .b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:999px;background:var(--brand);color:#fff;font-size:11.5px;margin-left:6px;padding:0 6px}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:18px 0 18px}
+.hero h1{margin:0;font-size:44px;line-height:1.12;letter-spacing:-.035em;font-weight:760;max-width:720px}
+.hero p{margin:10px 0 0;color:var(--ink-2);font-size:16px;max-width:560px}
+.rule-note{font-size:13px;color:var(--mut);width:330px;flex:none;margin:0}
+.search{background:#fff;border:1px solid var(--line-2);border-radius:20px;display:grid;grid-template-columns:1.2fr 1fr .8fr 1fr auto;align-items:stretch;padding:6px}
+.fld{display:flex;flex-direction:column;justify-content:center;padding:4px 16px 0;border-right:1px solid var(--line-2);min-height:60px}
+.fld:nth-last-child(2){border-right:0}
+.fld label{font-size:12px;font-weight:650;color:var(--mut)}
+.fld select,.fld input{border:0;background:transparent;font-size:15.5px;font-weight:600;padding:0;min-height:44px;width:100%;outline:none}
+.fld:focus-within{background:var(--soft);border-radius:14px}
+.search .go{align-self:center;margin:4px;border:0;background:var(--brand);color:#fff;border-radius:14px;padding:0 22px;min-height:52px;font-weight:650;font-size:15px;display:inline-flex;align-items:center;gap:8px}
+.search .go:hover{background:var(--brand-hover)}
+
+/* results */
+.res-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 0 12px}
+.res-head h2{margin:0;font-size:20px;letter-spacing:-.02em}
+.res-head .mut{color:var(--mut);font-size:14px}
+.split{display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);gap:24px;align-items:start;padding-bottom:40px}
+.list{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px}
+.mapcol{position:sticky;top:84px}
+.room{background:none;border:0;padding:0;text-align:left;display:block;width:100%;border-radius:var(--r-photo)}
+.room .ph{position:relative;border-radius:var(--r-photo);overflow:hidden;aspect-ratio:4/3;background:#E3E6DF}
+.room .ph img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.room:hover .ph img,.room.hl .ph img{transform:scale(1.035)}
+.room .tagl{position:absolute;left:10px;top:10px;background:#fff;border-radius:999px;font-size:12px;font-weight:650;padding:4px 10px}
+.room .tagr{position:absolute;right:10px;bottom:10px;background:rgba(24,32,28,.82);color:#fff;border-radius:8px;font-size:12px;font-weight:600;padding:3px 8px}
+.room h3{margin:11px 0 2px;font-size:16px;letter-spacing:-.015em;line-height:1.35}
+.room .meta{font-size:13.5px;color:var(--mut)}
+.room .price{margin-top:6px;font-size:15px}
+.room .price b{font-size:17px;font-weight:750}
+.room .est{font-size:13px;color:var(--ink-2);margin-top:2px}
+.empty{background:#fff;border:1px dashed var(--line);border-radius:var(--r-card);padding:36px 24px;text-align:center;color:var(--ink-2);grid-column:1/-1}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+
+/* map */
+.map{position:relative;border-radius:var(--r-xl);overflow:hidden;background:#E8ECE3;border:1px solid var(--line-2);aspect-ratio:600/470}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;transform:translate(-50%,-100%);border:0;background:#fff;color:var(--ink);font-weight:700;font-size:13px;border-radius:999px;padding:0 11px;min-height:32px;box-shadow:0 1px 3px rgba(16,24,20,.18),0 4px 10px rgba(16,24,20,.1);white-space:nowrap;transition:transform .15s,background .15s}
+.pin::before{content:"";position:absolute;inset:-7px -4px}
+.pin::after{content:"";position:absolute;left:50%;bottom:-5px;width:10px;height:10px;background:inherit;transform:translateX(-50%) rotate(45deg);border-radius:2px;z-index:-1}
+.pin.on,.pin:hover{background:var(--ink);color:#fff;transform:translate(-50%,-100%) scale(1.08);z-index:3}
+.pin small{font-weight:600;opacity:.7;font-size:11px}
+.map-note{position:absolute;left:12px;bottom:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.map-note span{background:rgba(255,255,255,.92);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--ink-2);line-height:1.35}
+.map-peek{margin-top:12px}
+.peek{display:flex;gap:14px;background:#fff;border:1px solid var(--line-2);border-radius:var(--r-card);padding:10px;align-items:center;width:100%;text-align:left}
+.peek img{width:92px;height:76px;object-fit:cover;border-radius:12px;flex:none}
+.peek b{display:block;font-size:15px}
+.peek span{font-size:13px;color:var(--mut)}
+
+.mob-switch{display:none}
+.mob-only{display:none}
+
+/* detail */
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;font-weight:600;color:var(--ink-2);min-height:44px;padding:0 4px;margin:10px 0 6px}
+.gal{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:215px 215px;gap:10px}
+.gal img{width:100%;height:100%;min-height:0;object-fit:cover;border-radius:var(--r-photo)}
+.gal img:first-child{grid-row:1/3}
+.gal-wrap{position:relative}
+.gal-cnt{display:none}
+.det{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:48px;padding:28px 0 60px;align-items:start}
+.det h1{margin:0;font-size:32px;line-height:1.2;letter-spacing:-.03em}
+.det .sub{color:var(--ink-2);margin-top:6px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:18px 0 6px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.facts span{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--ink-2)}
+.sec{padding:22px 0;border-bottom:1px solid var(--line)}
+.sec:last-child{border-bottom:0}
+.sec h2{font-size:18px;margin:0 0 10px;letter-spacing:-.02em}
+.sec p{margin:0;color:var(--ink-2)}
+.amen{columns:2;column-gap:24px;margin:0;padding:0;list-style:none}
+.amen li{padding:5px 0;display:flex;gap:8px;align-items:center;font-size:14.5px;color:var(--ink-2);break-inside:avoid}
+.tl{margin-top:6px}
+.tl-bar{position:relative;height:34px;background:var(--ok-bg);border-radius:10px;overflow:hidden}
+.tl-bar .blk{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,#D9DDD6 0 6px,#CDD2CA 6px 12px)}
+.tl-bar .blk.hold{background:repeating-linear-gradient(135deg,#FBE3A8 0 6px,#F7D88A 6px 12px)}
+.tl-bar .sel{position:absolute;top:4px;bottom:4px;border:2px solid var(--brand);border-radius:7px;background:var(--brand-tint)}
+.tl-ax{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--mut);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.minimap .map{max-width:560px}
+
+.book{position:sticky;top:96px;background:#fff;border:1px solid var(--line-2);border-radius:var(--r-xl);padding:22px;box-shadow:0 1px 2px rgba(16,24,20,.04)}
+.book .p1{font-size:24px;font-weight:760;letter-spacing:-.02em}
+.book .p1 small{font-size:14px;font-weight:500;color:var(--mut)}
+.book .usd{font-size:12.5px;color:var(--mut)}
+.dates{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden}
+.dates .fld{border-right:1px solid var(--line);min-height:58px;padding:6px 12px}
+.dates .fld:last-child{border-right:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:12px;min-height:36px;padding:0 12px;font-size:13.5px;font-weight:600;color:var(--ink-2);position:relative}
+.chip::before{content:"";position:absolute;inset:-4px 0}
+.chip[aria-pressed=true]{background:var(--brand-tint);border-color:var(--brand-tint-2);color:var(--brand-text)}
+.rcpt{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px}
+.rl{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:14.5px}
+.rl .f{display:block;font-size:12px;color:var(--mut);font-family:var(--mono);margin-top:1px}
+.rl.tot{border-top:1px solid var(--ink);margin-top:8px;padding-top:10px;font-weight:750;font-size:17px}
+.rl.dep{color:var(--ink-2)}
+.flash{animation:fl .9s}
+@keyframes fl{0%{background:var(--brand-tint-2)}100%{background:transparent}}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 12px;font-size:13.5px;margin-top:12px}
+.hint{font-size:13px;color:var(--mut);margin-top:10px;line-height:1.5}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;min-height:48px;padding:0 18px;font-weight:650;font-size:15px;background:var(--ink);color:#fff;text-decoration:none}
+.btn.brand{background:var(--brand)}
+.btn.brand:hover{background:var(--brand-hover)}
+.btn.line{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.soft{background:var(--track);color:var(--ink)}
+.btn.sm{min-height:44px;padding:0 14px;font-size:14px;border-radius:12px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.link{border:0;background:none;color:var(--brand-text);font-weight:600;font-size:13.5px;min-height:44px;padding:0 2px;text-decoration:underline;text-underline-offset:3px}
+.mbar{display:none}
+
+/* status pills */
+.st{display:inline-flex;align-items:center;gap:6px;border-radius:999px;font-size:12.5px;font-weight:650;padding:3px 10px;white-space:nowrap}
+.st::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.9}
+.st.pending{background:var(--neu-bg);color:var(--neu)}
+.st.approved{background:var(--warn-bg);color:var(--warn)}
+.st.paid,.st.confirmed{background:var(--ok-bg);color:var(--ok)}
+.st.rejected,.st.expired{background:#EEF0EC;color:#6B746E}
+.st.refunded,.st.partially_refunded{background:var(--info-bg);color:var(--info)}
+
+/* trips */
+.trips{display:grid;gap:16px;padding:8px 0 60px;max-width:880px}
+.trip{background:#fff;border:1px solid var(--line-2);border-radius:var(--r-xl);padding:18px;display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px}
+.trip>img{width:150px;height:150px;object-fit:cover;border-radius:16px}
+.trip h3{margin:0;font-size:18px;letter-spacing:-.02em}
+.trip .row1{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.trip .d{color:var(--ink-2);font-size:14px;margin-top:3px}
+.steps{display:flex;gap:4px;margin:14px 0 4px}
+.steps div{flex:1;font-size:12px;color:var(--mut)}
+.steps div::before{content:"";display:block;height:4px;border-radius:4px;background:var(--track);margin-bottom:6px}
+.steps div.on::before{background:var(--ink)}
+.steps div.on{color:var(--ink);font-weight:600}
+.box{margin-top:14px;border-radius:14px;padding:14px;background:var(--soft)}
+.box.warn{background:var(--warn-bg)}
+.box.ok{background:var(--ok-bg)}
+.box p{margin:0 0 10px;font-size:14px}
+.cd{font-family:var(--mono);font-weight:700;font-size:24px;letter-spacing:.02em;color:var(--ink)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* host */
+.host-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:26px 0 8px}
+.host-head h1{margin:0;font-size:32px;letter-spacing:-.03em}
+.host-head p{margin:4px 0 0;color:var(--ink-2)}
+.kpis{display:flex;gap:28px}
+.kpis div{font-size:13px;color:var(--mut)}
+.kpis b{display:block;font-size:26px;color:var(--ink);letter-spacing:-.02em}
+.panel{background:#fff;border:1px solid var(--line-2);border-radius:var(--r-card);overflow:hidden;margin-bottom:24px}
+.prow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1fr) 300px;gap:16px;align-items:center;padding:16px 20px;border-top:1px solid var(--line-2)}
+.prow:first-child{border-top:0}
+.prow>.acts{justify-content:flex-end}
+.who b{display:block;font-size:15.5px}
+.who span,.cell span{font-size:13px;color:var(--mut)}
+.cell{font-size:14px}
+.msg{grid-column:1/-1;margin-top:-6px;font-size:13.5px;color:var(--ink-2);background:var(--soft);border-radius:10px;padding:8px 12px}
+.conflict{grid-column:1/-1;margin-top:-6px;font-size:13px;color:var(--bad);background:var(--bad-bg);border-radius:10px;padding:8px 12px}
+.ph-h{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--soft);border-bottom:1px solid var(--line-2)}
+.ph-h b{font-size:16px}
+.ph-h span{font-size:13px;color:var(--mut)}
+.rhead{display:flex;gap:12px;align-items:center;min-width:0}
+.rrow{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr)) minmax(0,1.1fr) auto;gap:12px;align-items:center;padding:12px 20px;border-top:1px solid var(--line-2)}
+.rrow:first-of-type{border-top:0}
+.rrow img{flex:none;width:64px;height:52px;object-fit:cover;border-radius:10px}
+.rrow label{display:block;font-size:11.5px;color:var(--mut);font-weight:600}
+.in{width:100%;border:1px solid var(--line);border-radius:10px;min-height:40px;padding:0 10px;font-size:14px;background:#fff}
+.in:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
+.htabs{display:flex;gap:6px;margin:14px 0 18px;border-bottom:1px solid var(--line)}
+
+/* system view */
+.sys{padding-top:28px;padding-bottom:60px}
+.sys h1{font-size:40px;letter-spacing:-.035em;line-height:1.15;margin:0;max-width:900px;text-wrap:balance}
+.sys .lead{font-size:17px;color:var(--ink-2);max-width:760px;margin:12px 0 0}
+.sys h2{font-size:22px;letter-spacing:-.02em;margin:48px 0 6px}
+.sys h2+p{margin:0 0 18px;color:var(--ink-2)}
+.layers{display:grid;gap:8px}
+.ly{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:center;border-radius:16px;padding:16px 20px;background:#fff;border:1px solid var(--line-2)}
+.ly.keep{background:var(--soft);border-style:dashed}
+.ly.core{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ly.core .ly-k span{color:#C9D0CB}
+.ly-k b{display:block;font-size:16px}
+.ly-k span{font-size:12.5px;color:var(--mut)}
+.ly-v{display:flex;flex-wrap:wrap;gap:6px}
+.ly-v span{border:1px solid var(--line);background:#fff;border-radius:10px;padding:5px 10px;font-size:13.5px;color:var(--ink)}
+.ly.core .ly-v span{background:#26302B;border-color:#36413B;color:#fff}
+.ly.keep .ly-v span{background:transparent}
+.er{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.er-col{display:grid;gap:14px;align-content:start}
+.er-col>em{font-style:normal;font-size:12.5px;font-weight:650;color:var(--mut)}
+.tbl{background:#fff;border:1px solid var(--line-2);border-radius:14px;overflow:hidden;font-size:13px}
+.tbl header{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--soft);border-bottom:1px solid var(--line-2);font-family:var(--mono);font-weight:700;font-size:13px}
+.tbl header span{font-family:var(--font);font-weight:600;font-size:11.5px;color:var(--mut)}
+.tbl div{display:flex;justify-content:space-between;gap:8px;padding:5px 12px;font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.tbl div i{font-style:normal;color:var(--mut-2)}
+.tbl div.fk i{color:var(--brand-text)}
+.tbl div.pk{color:var(--ink);font-weight:700}
+.tbl div.cx{background:var(--brand-tint);color:var(--brand-text)}
+.sm-wrap{background:#fff;border:1px solid var(--line-2);border-radius:var(--r-xl);padding:12px;overflow:hidden}
+.sm-wrap svg{width:100%;height:auto;display:block}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin:0;padding:0;list-style:none}
+.rules li{padding:14px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:22px 1fr;gap:10px}
+.rules b{display:block}
+.rules span{font-size:14px;color:var(--ink-2)}
+.pg{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--r-card);overflow:hidden;font-size:14px}
+.pg th,.pg td{text-align:left;padding:12px 14px;border-top:1px solid var(--line-2);vertical-align:top}
+.pg th{background:var(--soft);font-size:12.5px;color:var(--mut);font-weight:650;border-top:0}
+.pg td:first-child{font-weight:650;white-space:nowrap}
+.tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:650;background:var(--warn-bg);color:var(--warn)}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.no{background:var(--bad-bg);color:var(--bad)}
+.tests{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;background:#fff;border:1px solid var(--line-2);border-radius:var(--r-card);padding:4px 20px}
+.test{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line-2)}
+.test:nth-child(-n+2){border-top:0}
+.test b{display:block;font-size:14.5px}
+.test span{font-size:13.5px;color:var(--ink-2)}
+.test em{font-style:normal;margin-left:auto;flex:none}
+.stack{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line-2);border-radius:var(--r-card);background:#fff;overflow:hidden}
+.stack div{padding:16px;border-left:1px solid var(--line-2)}
+.stack div:first-child{border-left:0}
+.stack b{display:block;font-size:12.5px;color:var(--mut);font-weight:650}
+.stack span{display:block;font-size:15px;font-weight:650;margin-top:4px}
+.stack small{display:block;font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.45}
+
+/* trace */
+.trace{position:fixed;z-index:40;top:0;right:0;bottom:0;width:var(--trace-w);background:#141A17;color:#E3E8E4;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column}
+body.trace-open .trace{transform:none}
+.trace header{padding:16px 16px 12px;border-bottom:1px solid #26302B;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.trace header b{font-size:15px;display:block}
+.trace header span{font-size:12px;color:#9BA59E;line-height:1.4;display:block;margin-top:3px}
+.trace .x{border:0;background:#222B26;color:#fff;border-radius:10px;width:44px;height:44px;flex:none;display:grid;place-items:center}
+.tlog{flex:1;overflow:auto;padding:8px 12px 24px}
+.ev{border-left:2px solid #36413B;padding:6px 0 10px 12px;margin:6px 0;font-family:var(--mono);font-size:12px;line-height:1.55}
+.ev .h{display:flex;justify-content:space-between;gap:8px;color:#fff;font-weight:700}
+.ev .h time{color:#7E8983;font-weight:400}
+.ev .l{color:#B9C2BB;white-space:pre-wrap;word-break:break-word}
+.ev.k-req{border-color:#6FA8FF}.ev.k-db{border-color:#5BD19B}.ev.k-hook{border-color:#F7B955}.ev.k-pg{border-color:#F27A98}.ev.k-err{border-color:#FF6B6B}.ev.k-job{border-color:#B9A6FF}
+.ev.new{animation:evin .5s}
+@keyframes evin{from{background:#26302B}to{background:transparent}}
+.trace .tlegend{display:flex;flex-wrap:wrap;gap:4px 12px;padding:10px 16px;border-top:1px solid #26302B;font-size:11.5px;color:#9BA59E}
+.trace .tlegend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+
+/* modal / sheet */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(16,22,19,.45);display:grid;place-items:center;padding:20px}
+.sheet{background:#fff;border-radius:var(--r-xl);width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:22px;box-shadow:var(--sh-pop)}
+.sheet h3{margin:0;font-size:20px;letter-spacing:-.02em}
+.sheet .x{float:right;border:0;background:var(--track);border-radius:12px;width:44px;height:44px;display:grid;place-items:center;margin:-6px -6px 0 0}
+.mock-note{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;margin:14px 0}
+.paym{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.paym button{border:1.5px solid var(--line);background:#fff;border-radius:14px;min-height:64px;padding:10px 12px;text-align:left;font-weight:650}
+.paym button small{display:block;font-weight:500;color:var(--mut);font-size:12px}
+.paym button[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.fakecard{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px}
+.fakecard div{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-2)}
+.fakecard code{font-family:inherit;font-weight:600;color:var(--ink);text-align:right}
+.prog{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.prog li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--mut)}
+.prog li i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+.prog li.run{color:var(--ink)}
+.prog li.run i{border-color:var(--brand);border-top-color:transparent;animation:spin .8s linear infinite}
+.prog li.done{color:var(--ink)}
+.prog li.done i{background:var(--ok-dot);border-color:var(--ok-dot)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{width:max-content;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;background:var(--ink);color:#fff;border-radius:14px;padding:12px 16px;font-size:14px;display:flex;gap:12px;align-items:center;box-shadow:var(--sh-pop);max-width:calc(100% - 32px)}
+.toast button{border:0;background:#2E3833;color:#fff;border-radius:10px;min-height:36px;padding:0 12px;font-weight:600;font-size:13px;white-space:nowrap}
+
+.foot{border-top:1px solid var(--line);margin-top:20px}
+.foot .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 24px 40px;font-size:13px;color:var(--mut)}
+.foot a{color:var(--ink-2)}
+
+/* ---------- mobile ---------- */
+@media(max-width:1100px){
+  .split{grid-template-columns:1fr 1fr}
+  .list{grid-template-columns:1fr}
+  .det{grid-template-columns:minmax(0,1fr) 360px;gap:28px}
+  .rrow{grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr))}
+}
+@media(max-width:820px){
+  body{font-size:15px}
+  .demo-bar span[lang]{display:none}
+  .demo-bar .long{display:none}
+  .top{position:static}
+  .book [data-act=apply]{display:none}
+  .seg-lbl{display:none}
+  .wrap{padding:0 16px}
+  .top-in{flex-wrap:wrap;padding:8px 16px;gap:8px}
+  .logo small{display:none}
+  .top .seg.role{order:5;width:100%;margin:0;display:grid;grid-template-columns:1fr 1fr 1fr}
+  .top .seg.role button{padding:0 6px;font-size:13.5px;min-height:44px}
+  .mob-switch button{min-height:44px}
+  .lang{margin-left:auto}
+  .trace-btn .lbl{display:none}
+  .trace-btn{min-width:44px;min-height:44px;justify-content:center}
+  .lang button{min-height:44px}
+  .hero{display:block;padding:10px 0 14px}
+  .hero h1{font-size:30px;line-height:1.18}
+  .hero p{font-size:15px}
+  .rule-note{display:none}
+  .search{grid-template-columns:1fr 1fr;padding:4px;border-radius:18px}
+  .fld{border-right:0;border-bottom:1px solid var(--line-2);padding:6px 12px}
+  .fld:nth-child(odd){border-right:1px solid var(--line-2)}
+  .fld:nth-last-child(2){border-bottom:1px solid var(--line-2)}
+  .search .go{grid-column:1/-1;margin:6px 4px 4px}
+  .mob-only{display:inline}
+  .mob-switch{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .res-head{flex-wrap:wrap;padding:16px 0 10px}
+  .split{display:block}
+  .split[data-m=list] .mapcol{display:none}
+  .split[data-m=map] .list{display:none}
+  .mapcol{position:static}
+  .gal{display:flex;height:auto;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px;margin:0 -16px;padding:0 16px;scrollbar-width:none}
+  .gal::-webkit-scrollbar{display:none}
+  .gal img{flex:0 0 100%;height:270px;scroll-snap-align:center;border-radius:18px}
+  .gal-cnt{display:block;position:absolute;right:12px;bottom:12px;background:rgba(24,32,28,.8);color:#fff;font-size:12px;border-radius:8px;padding:3px 9px}
+  .det{display:block;padding:18px 0 120px}
+  .det h1{font-size:25px}
+  .book{position:static;margin-top:18px;padding:18px;border-radius:20px}
+  .amen{columns:1}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:35;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));align-items:center;justify-content:space-between;gap:12px}
+  .mbar b{display:block;font-size:17px}
+  .mbar span{font-size:12px;color:var(--mut)}
+  .trip{grid-template-columns:1fr;padding:14px}
+  .trip>img{width:100%;height:170px}
+  .host-head{display:block;padding:18px 0 4px}
+  .host-head h1{font-size:26px}
+  .kpis{margin-top:14px;gap:22px}
+  .kpis b{font-size:22px}
+  .prow{grid-template-columns:1fr 1fr;padding:14px 16px;gap:10px}
+  .prow .acts{grid-column:1/-1}
+  .prow .acts .btn{flex:1}
+  .rrow{grid-template-columns:1fr 1fr;padding:14px 16px}
+  .rrow .rhead{grid-column:1/-1}
+  .rrow .acts{grid-column:1/-1}
+  .rrow .acts .btn{flex:1}
+  .htabs{overflow-x:auto}
+  .sys h1{font-size:28px}
+  .sys .lead{font-size:15.5px}
+  .ly{grid-template-columns:1fr;gap:10px;padding:14px}
+  .er{grid-template-columns:1fr}
+  .rules,.tests{grid-template-columns:1fr}
+  .test:nth-child(2){border-top:1px solid var(--line-2)}
+  .stack{grid-template-columns:1fr 1fr}
+  .stack div:nth-child(3){border-left:0}
+  .stack div:nth-child(n+3){border-top:1px solid var(--line-2)}
+  .pg-wrap{overflow-x:auto;border-radius:var(--r-card)}
+  .sm-wrap{overflow-x:auto}
+  .sm-wrap svg{width:760px;max-width:none}
+  .trip .row1{flex-direction:column-reverse;align-items:flex-start;gap:8px}
+  .pg{min-width:620px}
+  :root{--trace-w:100%}
+  .trace{top:auto;height:78vh;border-radius:22px 22px 0 0;transform:translateY(100%)}
+  .ov{align-items:end;padding:0}
+  .sheet{border-radius:24px 24px 0 0;width:100%;max-height:92vh;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
+  .toast{bottom:84px}
+  .foot .wrap{padding:20px 16px 100px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="demo-bar"><b>제안용 데모 · 예시</b><span class="long"> — 숙소·호스트·게스트·결제는 모두 가상이에요.</span> 실제 결제는 일어나지 않아요. <span lang="en">Proposal demo · all listings and payments are fictional.</span></div>
+<header class="top"><div class="top-in" id="top"></div></header>
+<main id="app"></main>
+<footer class="foot"><div class="wrap" id="foot"></div></footer>
+<aside class="trace" id="trace" aria-label="Server trace"></aside>
+<div id="layer"></div>
+
+<script>
+(()=>{
+'use strict';
+/* ---------------- icons (1.8px line set) ---------------- */
+const I=(p,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ic={
+ search:I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+ back:I('<path d="m15 18-6-6 6-6"/>'),
+ bed:I('<path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/>'),
+ bath:I('<path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3ZM6 12V6a2 2 0 0 1 4 0"/>'),
+ size:I('<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h6V4"/>'),
+ train:I('<rect x="6" y="3" width="12" height="13" rx="3"/><path d="M6 11h12M9 20l-2 2M15 20l2 2M9 16v4M15 16v4"/>'),
+ people:I('<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M21 20a6 6 0 0 0-4-5.6"/>'),
+ check:I('<path d="m5 12 5 5 9-10"/>',16),
+ x:I('<path d="M6 6l12 12M18 6 6 18"/>'),
+ term:I('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 9 3 3-3 3M12 15h5"/>'),
+ wifi:I('<path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r=".8"/>',16),
+ desk:I('<path d="M3 8h18M5 8v11M19 8v11M14 8v6h5"/>',16),
+ wash:I('<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M7 6h2"/>',16),
+ key:I('<circle cx="8" cy="14" r="4"/><path d="m11 11 9-9M17 5l2 2M15 7l2 2"/>',16),
+ kitchen:I('<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 1-3 4-3 8h3"/>',16),
+ snow:I('<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/>',16),
+ clock:I('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',16),
+ shield:I('<path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/>',16),
+ dot:I('<circle cx="12" cy="12" r="3"/>',16)
+};
+
+/* ---------------- i18n ---------------- */
+const T={
+ ko:{guest:'게스트',host:'호스트',sys:'시제품 아래',trace:'서버 로그',find:'방 찾기',trips:'내 예약',
+  heroH:'서울에서 한 달, 방 하나부터',heroP:'공유주택의 방 단위로 비교하고, 입주일과 머무는 기간을 넣으면 월할·일할 금액까지 바로 보여 드려요.',
+  ruleNote:'가격 규칙(예시): 월세 × 꽉 찬 개월 + 남은 날은 월세 ÷ 30 × 일수. 관리비도 같은 방식, 보증금은 따로.',
+  area:'지역',movein:'입주일',months:'기간',budget:'월 예산',searchBtn:'방 검색',all:'서울 전체',any:'상관없음',upto:'이하',
+  m:'개월',rooms:'개의 방',matching:'조건에 맞는 방',listV:'목록',mapV:'지도',
+  from:'부터 입주 가능',month:'월',deposit:'보증금',fee:'관리비',est:'예상 합계',
+  emptyH:'조건에 맞는 방이 없어요',emptyP:'예산을 올리거나 입주일을 며칠 미뤄 보세요.',reset:'조건 초기화',
+  mapNote:'지도 예시 · 실서비스는 지도 API와 호스트가 등록한 좌표를 써요',
+  back:'목록으로',size:'㎡',privBath:'개인 욕실',shareBath:'공용 욕실',floor:'층',housemates:'명이 함께 사는 집',walk:'도보',min:'분',
+  about:'이 방',amenH:'포함된 것',availH:'입주 가능 일정',where:'위치',
+  lgFree:'입주 가능',lgBooked:'예약됨',lgHold:'승인 후 결제 대기(24시간 확보)',lgSel:'선택한 기간',
+  moveout:'퇴실일',perMonth:'/ 월',rent:'월세',days:'일',dep2:'보증금 (퇴실 후 돌려받음)',stayTot:'숙박 금액',dueAfter:'승인 후 결제할 금액',
+  apply:'입주 신청 보내기',applyShort:'입주 신청',
+  applyHint:'신청만으로는 결제되지 않아요. 호스트가 승인하면 24시간 동안 이 방이 다른 사람에게 열리지 않고, 그 안에 결제하면 예약이 확정돼요.',
+  errMin:'최소 1개월 이상 머물러야 해요.',errAvail:'이 날짜부터는 아직 입주할 수 없어요. 가능한 첫날:',errOverlap:'선택한 기간에 이미 예약되었거나 확보된 날이 있어요.',errOrder:'퇴실일은 입주일보다 뒤여야 해요.',
+  noTrips:'아직 신청한 방이 없어요',noTripsP:'방을 고르고 입주 신청을 보내면 여기에서 승인·결제·확정까지 따라갈 수 있어요.',goFind:'방 찾으러 가기',
+  s_pending:'승인 대기',s_approved:'결제 대기 · 24시간 확보',s_paid:'결제 완료',s_confirmed:'예약 확정',s_rejected:'거절됨',s_expired:'확보 시간 만료',s_refunded:'전액 환불',s_partially_refunded:'부분 환불',
+  st1:'신청',st2:'승인·확보',st3:'결제',st4:'확정',
+  pendBox:'호스트가 신청을 확인하고 있어요. 승인되면 알림을 보내 드려요.',tryHost:'호스트 화면에서 승인해 보기',
+  holdBox:'이 시간 안에 결제하면 방이 확정돼요. 지나면 방이 다시 열려요.',left:'남음',payCard:'카드로 결제',payPal:'PayPal로 결제',ff:'24시간이 지난 상황 보기(데모)',
+  confBox:'결제가 확인되어 예약이 확정됐어요. 입주 안내는 입주 3일 전에 보내 드려요.',paidWith:'결제',refundedAmt:'환불',
+  expBox:'24시간 안에 결제가 없어 확보가 풀렸어요. 방이 아직 비어 있다면 다시 신청할 수 있어요.',reapply:'다시 신청하기',
+  rejBox:'호스트가 이번 신청은 받기 어렵다고 했어요. 결제된 금액은 없어요.',
+  payTitle:'결제하기',mockNote:'모의 결제창이에요. 카드 정보를 받지 않고, 실제 결제도 일어나지 않아요. 실서비스에서는 PG사 결제창이 열려요.',
+  card:'해외·국내 카드',cardS:'VISA · Master · JCB 등',pp:'PayPal',ppS:'USD로 승인 (예시 환율)',
+  payNow:'모의 결제 승인',payFail:'카드가 거절되는 경우 보기',amount:'결제 금액',
+  p1:'승인 당시 금액으로 서버 검증',p2:'PG 승인 API 응답 확인',p3:'결제 조회로 교차 확인',p4:'확보 시간 재확인 후 예약 확정',
+  lateMsg:'결제가 끝나기 전에 24시간 확보가 끝나서 예약을 확정하지 않고 결제를 자동 취소했어요.',
+  failMsg:'카드사에서 거절됐어요(예시). 확보 시간 안에 다른 카드나 PayPal로 다시 시도할 수 있어요.',
+  toastApplied:'입주 신청을 보냈어요',toastApproved:'승인됨 · 24시간 확보 시작',toastPaid:'결제 확인 · 예약 확정',seeLog:'서버 로그 보기',
+  traceT:'서버 동작 시뮬레이션',traceS:'실서비스라면 이 버튼 뒤에서 일어나는 API 호출·DB 변경·웹훅이에요. 데모라 브라우저 안에서 흉내만 내요.',
+  hostH:'호스트 관리',hostP:'집과 방, 입주 신청, 입주자를 한 곳에서 관리해요.',
+  kNew:'새 신청',kHold:'결제 대기',kLive:'입주 중·예정',
+  tApps:'입주 신청',tRooms:'집·방 관리',tTen:'입주자',
+  approve:'승인 · 24시간 확보',reject:'거절',noApps:'처리할 신청이 없어요',noAppsP:'게스트 화면에서 방을 신청하면 여기에 바로 나타나요.',
+  conflictMsg:'같은 방, 겹치는 기간에 이미 확보·확정된 예약이 있어 승인할 수 없어요. (DB 제약으로 막힘)',
+  holdLeft:'확보 남은 시간',saved:'저장했어요',save:'저장',availFrom:'입주 가능일',status:'상태',
+  r_free:'입주 가능',r_hold:'확보 중',r_live:'입주 중',
+  ten:'입주자',period:'기간',paid:'결제',actions:'관리',partial:'부분 환불',cancelAll:'전액 취소',noTen:'아직 확정된 입주자가 없어요',
+  refundT:'환불하기',refundEarly:'조기 퇴실 · 남은 기간 일할 환불',refundDep:'보증금 돌려주기',refundCustom:'금액 직접 입력',newOut:'새 퇴실일',refundAmt:'환불 금액',refundMax:'남은 환불 가능 금액',refundGo:'모의 환불 실행',
+  refundErr:'환불 가능 금액을 넘었어요. 누적 환불은 결제 금액을 넘을 수 없어요.',
+  cancelQ:'전액 취소하면 결제 금액 전부를 환불하고 방을 다시 열어요.',cancelGo:'전액 취소 · 모의 환불',
+  resetDemo:'데모 초기화',credit:'사진: Unsplash 무료 라이선스 사진 · 지도는 그림 예시',
+  guestMe:'Sophie R. (예시 게스트)',close:'닫기',
+ },
+ en:{guest:'Guest',host:'Host',sys:'Under the hood',trace:'Server log',find:'Find a room',trips:'My bookings',
+  heroH:'A month in Seoul, one room at a time',heroP:'Compare rooms in shared houses. Pick a move-in date and length of stay to see the exact monthly and daily-prorated price.',
+  ruleNote:'Pricing rule (example): rent × full months + rent ÷ 30 × leftover days. Same for the maintenance fee; deposit is separate.',
+  area:'Area',movein:'Move-in',months:'Stay',budget:'Monthly budget',searchBtn:'Search rooms',all:'All of Seoul',any:'Any',upto:'or less',
+  m:' mo',rooms:' rooms',matching:'Rooms that match',listV:'List',mapV:'Map',
+  from:'Available from',month:'mo',deposit:'Deposit',fee:'Maint. fee',est:'Est. total',
+  emptyH:'No rooms match yet',emptyP:'Try a higher budget or move your date a few days later.',reset:'Reset filters',
+  mapNote:'Illustrative map · the live site uses a map API with host-registered coordinates',
+  back:'Back to list',size:'m²',privBath:'Private bath',shareBath:'Shared bath',floor:'F',housemates:' people share this house',walk:'',min:' min walk',
+  about:'About this room',amenH:'What is included',availH:'Availability',where:'Location',
+  lgFree:'Available',lgBooked:'Booked',lgHold:'Approved, awaiting payment (24h hold)',lgSel:'Your dates',
+  moveout:'Move-out',perMonth:'/ month',rent:'Rent',days:' days',dep2:'Deposit (returned after move-out)',stayTot:'Stay total',dueAfter:'Due after approval',
+  apply:'Send move-in request',applyShort:'Request',
+  applyHint:'Requesting is free. If the host approves, the room is held for you for 24 hours. Pay within that window and the booking is confirmed.',
+  errMin:'Minimum stay is 1 month.',errAvail:'This room is not available yet. First available day:',errOverlap:'Some of your dates are already booked or on hold.',errOrder:'Move-out must be after move-in.',
+  noTrips:'No requests yet',noTripsP:'Pick a room and send a request. You can follow approval, payment and confirmation here.',goFind:'Find a room',
+  s_pending:'Waiting for host',s_approved:'Pay within 24h',s_paid:'Paid',s_confirmed:'Confirmed',s_rejected:'Declined',s_expired:'Hold expired',s_refunded:'Refunded',s_partially_refunded:'Partly refunded',
+  st1:'Request',st2:'Approved',st3:'Payment',st4:'Confirmed',
+  pendBox:'The host is reviewing your request. We will let you know once it is approved.',tryHost:'Approve it from the host view',
+  holdBox:'Pay before the timer ends and the room is yours. After that, the room opens up again.',left:'left',payCard:'Pay by card',payPal:'Pay with PayPal',ff:'Skip ahead 24 hours (demo)',
+  confBox:'Payment received and your booking is confirmed. Move-in details arrive 3 days before.',paidWith:'Paid',refundedAmt:'Refunded',
+  expBox:'No payment within 24 hours, so the hold was released. You can request again if the room is still free.',reapply:'Request again',
+  rejBox:'The host could not accept this request. You were not charged.',
+  payTitle:'Checkout',mockNote:'Mock checkout. No card details are collected and no money moves. The live site opens the payment provider window here.',
+  card:'Card',cardS:'VISA · Master · JCB and more',pp:'PayPal',ppS:'Charged in USD (sample rate)',
+  payNow:'Approve mock payment',payFail:'Show a declined card',amount:'Amount',
+  p1:'Server checks the approved price',p2:'Provider approval response',p3:'Cross-checked via payment lookup',p4:'Hold re-checked, booking confirmed',
+  lateMsg:'The 24h hold ended before payment finished, so the booking was not confirmed and the payment was cancelled automatically.',
+  failMsg:'Card declined (example). You can retry with another card or PayPal while the hold is active.',
+  toastApplied:'Request sent',toastApproved:'Approved · 24h hold started',toastPaid:'Payment verified · booking confirmed',seeLog:'Open server log',
+  traceT:'Server trace (simulated)',traceS:'What would happen behind each button on the live site: API calls, DB changes, webhooks. Simulated in your browser; some notes are in Korean for the client.',
+  hostH:'Host dashboard',hostP:'Houses, rooms, requests and tenants in one place.',
+  kNew:'New requests',kHold:'Awaiting payment',kLive:'Current & upcoming',
+  tApps:'Requests',tRooms:'Houses & rooms',tTen:'Tenants',
+  approve:'Approve · hold 24h',reject:'Decline',noApps:'No requests to review',noAppsP:'Requests sent from the guest view show up here instantly.',
+  conflictMsg:'Another booking already holds this room for overlapping dates, so this cannot be approved (blocked by a DB constraint).',
+  holdLeft:'Hold time left',saved:'Saved',save:'Save',availFrom:'Available from',status:'Status',
+  r_free:'Available',r_hold:'On hold',r_live:'Occupied',
+  ten:'Tenant',period:'Dates',paid:'Paid',actions:'Manage',partial:'Partial refund',cancelAll:'Cancel & refund',noTen:'No confirmed tenants yet',
+  refundT:'Refund',refundEarly:'Early move-out · prorated refund',refundDep:'Return deposit',refundCustom:'Custom amount',newOut:'New move-out',refundAmt:'Refund amount',refundMax:'Refundable balance',refundGo:'Run mock refund',
+  refundErr:'This exceeds the refundable balance. Total refunds can never exceed the amount paid.',
+  cancelQ:'Cancelling refunds the full amount and opens the room again.',cancelGo:'Cancel · mock full refund',
+  resetDemo:'Reset demo',credit:'Photos: Unsplash (free license) · map is illustrative',
+  guestMe:'Sophie R. (sample guest)',close:'Close',
+ }
+};
+
+/* ---------------- data ---------------- */
+const U=id=>`https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=900&q=70`;
+const P={a:'1522708323590-d24dbb6b0267',b:'1502672260266-1c1ef2d93688',c:'1505693416388-ac5ce068fe85',d:'1493809842364-78817add7ffb',e:'1560448204-e02f11c3d0e2',f:'1484154218962-a197022b5858',g:'1556020685-ae41abfc9365',h:'1540518614846-7eded433c457',i:'1595526114035-0d45ed16cfbf',j:'1586023492125-27b2c045efd7',k:'1617806118233-18e1de247200',l:'1513694203232-719a280e022f',m:'1554995207-c18c203602cb',n:'1538688525198-9b88f6f53126',o:'1631049307264-da0ec9d70304',q:'1567767292278-a4f21aa2d36e',v:'1615874959474-d609969a20ed',w:'1616594039964-ae9021a400a0',x:'1600210492486-724fe5c67fb0',y:'1583847268964-b28dc8f51f92',z:'1560185007-cde436f6a4d0',aa:'1501183638710-841dd1904471',ab:'1536376072261-38c75010e6c9'};
+const AREAS={mapo:{ko:'마포구',en:'Mapo'},sd:{ko:'성동구',en:'Seongdong'},ys:{ko:'용산구',en:'Yongsan'},sdm:{ko:'서대문구',en:'Seodaemun'},jn:{ko:'종로구',en:'Jongno'}};
+const HOUSES=[
+ {id:'h1',area:'mapo',x:26,y:33,ko:'연남 가든하우스',en:'Yeonnam Garden House',st:{ko:'홍대입구역',en:'Hongik Univ. Stn'},w:6,mates:4},
+ {id:'h2',area:'mapo',x:13,y:57,ko:'망원 리버사이드',en:'Mangwon Riverside',st:{ko:'망원역',en:'Mangwon Stn'},w:4,mates:3},
+ {id:'h3',area:'mapo',x:34,y:58,ko:'합정 로프트',en:'Hapjeong Loft',st:{ko:'합정역',en:'Hapjeong Stn'},w:3,mates:2},
+ {id:'h4',area:'sd',x:74,y:48,ko:'성수 브릭하우스',en:'Seongsu Brick House',st:{ko:'성수역',en:'Seongsu Stn'},w:7,mates:5},
+ {id:'h5',area:'ys',x:47,y:58,ko:'해방촌 힐하우스',en:'Haebangchon Hill House',st:{ko:'녹사평역',en:'Noksapyeong Stn'},w:9,mates:3},
+ {id:'h6',area:'sdm',x:41,y:41,ko:'신촌 스터디하우스',en:'Sinchon Study House',st:{ko:'신촌역',en:'Sinchon Stn'},w:5,mates:6},
+ {id:'h7',area:'jn',x:57,y:27,ko:'익선 코트야드',en:'Ikseon Courtyard',st:{ko:'종로3가역',en:'Jongno 3-ga Stn'},w:4,mates:2},
+];
+const ROOMS0=[
+ {id:'rm_101',h:'h1',ko:'창가 큰 방 A',en:'Window Room A',rent:1150000,dep:1000000,fee:120000,size:14,bath:'p',fl:2,av:7,ph:['i','b','g'],am:['wifi','desk','wash','snow','key','kitchen']},
+ {id:'rm_102',h:'h1',ko:'정원 쪽 방 B',en:'Garden Room B',rent:950000,dep:800000,fee:120000,size:11,bath:'s',fl:1,av:14,ph:['v','b','y'],am:['wifi','desk','wash','key','kitchen']},
+ {id:'rm_201',h:'h2',ko:'한강 가까운 방',en:'Near-the-River Room',rent:1080000,dep:1000000,fee:110000,size:12,bath:'p',fl:3,av:20,ph:['n','d','f'],am:['wifi','desk','wash','snow','key']},
+ {id:'rm_301',h:'h3',ko:'복층 로프트',en:'Mezzanine Loft',rent:1450000,dep:1500000,fee:150000,size:22,bath:'p',fl:4,av:3,ph:['ab','m','aa'],am:['wifi','desk','wash','snow','key','kitchen']},
+ {id:'rm_401',h:'h4',ko:'벽돌집 2층 방',en:'Brick House Upper Room',rent:1250000,dep:1000000,fee:130000,size:15,bath:'p',fl:2,av:10,ph:['w','m','l'],am:['wifi','desk','wash','snow','key','kitchen']},
+ {id:'rm_402',h:'h4',ko:'벽돌집 아늑한 방',en:'Brick House Cozy Room',rent:1020000,dep:800000,fee:130000,size:12,bath:'s',fl:2,av:12,ph:['o','l','g'],am:['wifi','desk','wash','key']},
+ {id:'rm_501',h:'h5',ko:'남산 보이는 방',en:'Namsan View Room',rent:1180000,dep:1000000,fee:100000,size:13,bath:'p',fl:3,av:25,ph:['q','x','w2'],am:['wifi','desk','wash','snow','key']},
+ {id:'rm_601',h:'h6',ko:'책상 넓은 방',en:'Big Desk Room',rent:880000,dep:500000,fee:100000,size:10,bath:'s',fl:2,av:5,ph:['j','z','a'],am:['wifi','desk','wash','key','kitchen']},
+ {id:'rm_701',h:'h7',ko:'익선동 조용한 방',en:'Quiet Ikseon Room',rent:1320000,dep:1200000,fee:120000,size:16,bath:'p',fl:2,av:30,ph:['c','e','f'],am:['wifi','desk','wash','snow','key','kitchen']},
+];
+P.w2='1513694203232-719a280e022f';
+const DESC={
+ rm_101:{ko:'남향 창이 커서 오후 내내 밝아요. 퀸 침대, 넓은 옷장, 1인 책상이 있고 방 안에 작은 욕실이 붙어 있어요. 홍대·연트럴파크까지 걸어서 다닐 수 있어요.',en:'Big south-facing windows keep it bright all afternoon. Queen bed, large wardrobe, a desk and a small en-suite bath. Walk to Hongdae and Yeontral Park.'},
+ rm_102:{ko:'1층 정원 쪽 조용한 방이에요. 욕실은 2층 방 하나와 같이 써요. 처음 서울에 오는 분께 가격 부담이 적은 방이에요.',en:'A quiet ground-floor room facing the garden. Bathroom shared with one other room. A budget-friendly first base in Seoul.'},
+};
+const defDesc={ko:'침대, 옷장, 책상이 있는 개인 방이에요. 주방과 거실은 함께 쓰고, 매주 공용 공간 청소가 포함돼요. 입주 전 영상 통화로 방을 보여 드릴 수 있어요.',en:'A private room with bed, wardrobe and desk. Kitchen and living room are shared, with weekly common-area cleaning. Video tour available before you move in.'};
+const AMEN={wifi:{ko:'와이파이 (기가)',en:'Gigabit Wi-Fi'},desk:{ko:'책상·의자',en:'Desk & chair'},wash:{ko:'세탁기·건조기',en:'Washer & dryer'},snow:{ko:'개별 냉난방',en:'Own A/C & heating'},key:{ko:'디지털 도어락',en:'Keyless entry'},kitchen:{ko:'공용 주방',en:'Shared kitchen'}};
+
+/* ---------------- dates & money ---------------- */
+const D0=(()=>{const d=new Date();d.setHours(0,0,0,0);return d})();
+const addD=(d,n)=>{const r=new Date(d);r.setDate(r.getDate()+n);return r};
+const addM=(d,n)=>{const r=new Date(d.getFullYear(),d.getMonth()+n,1);const last=new Date(r.getFullYear(),r.getMonth()+1,0).getDate();r.setDate(Math.min(d.getDate(),last));return r};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const pd=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const dd=(a,b)=>Math.round((b-a)/864e5);
+const won=n=>'₩'+Math.round(n).toLocaleString('en-US');
+const USD=1380; // 예시 환율
+const short=n=>S.lang==='ko'?(n/10000).toLocaleString('ko-KR',{maximumFractionDigits:1})+'만':n<1e6?'₩'+Math.round(n/1000)+'k':'₩'+(n/1e6).toFixed(2).replace(/0$/,'')+'M';
+const fd=s=>{const d=typeof s==='string'?pd(s):s;return S.lang==='ko'?`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
+const fds=s=>{const d=typeof s==='string'?pd(s):s;return S.lang==='ko'?`${d.getMonth()+1}.${d.getDate()}`:d.toLocaleDateString('en-US',{month:'short',day:'numeric'})};
+function quote(r,inS,outS){const a=pd(inS),b=pd(outS);let m=0;while(addM(a,m+1)<=b)m++;const d=dd(addM(a,m),b);
+ const rentM=r.rent*m,rentD=Math.round(r.rent/30*d/100)*100,feeM=r.fee*m,feeD=Math.round(r.fee/30*d/100)*100,stay=rentM+rentD+feeM+feeD;
+ return {m,d,rentM,rentD,feeM,feeD,stay,dep:r.dep,due:stay+r.dep,nights:dd(a,b)}}
+
+/* ---------------- store ---------------- */
+const KEY='stayfold_demo_v1';
+const rid=p=>p+'_'+Math.random().toString(36).slice(2,7);
+const now=()=>Date.now();
+function seed(){
+ const rooms=ROOMS0.map(r=>({...r,avail:iso(addD(D0,r.av))}));
+ const mk=(o)=>{const r=rooms.find(x=>x.id===o.room);const q=quote(r,o.in,o.out);return {id:o.id,room:o.room,guest:o.guest,country:o.country,in:o.in,out:o.out,q,rate:{rent:r.rent,fee:r.fee,dep:r.dep},status:o.status,msg:o.msg||'',created:now()-(o.ago||3)*3600e3,hold:o.hold||null,pay:o.pay||null,refunded:0,mine:!!o.mine}};
+ const apps=[
+  mk({id:'app_24011',room:'rm_401',guest:'Lucas M.',country:{ko:'프랑스',en:'France'},in:iso(addD(D0,21)),out:iso(addM(addD(D0,21),2)),status:'pending',msg:'Hi! I am doing a 2-month UX internship in Seongsu. Non-smoker, quiet.',ago:5}),
+  mk({id:'app_24012',room:'rm_401',guest:'Yuki S.',country:{ko:'일본',en:'Japan'},in:iso(addD(D0,30)),out:iso(addD(addM(addD(D0,30),1),10)),status:'pending',msg:'Language exchange student. Can I move in in the morning?',ago:2}),
+  mk({id:'app_24008',room:'rm_101',guest:'Daniel K.',country:{ko:'미국',en:'USA'},in:iso(addD(D0,40)),out:iso(addM(addD(D0,40),3)),status:'approved',hold:now()+6*3600e3+1240e3,ago:18}),
+  mk({id:'app_23990',room:'rm_201',guest:'Emma W.',country:{ko:'독일',en:'Germany'},in:iso(addD(D0,-41)),out:iso(addD(D0,19)),status:'confirmed',pay:{id:'pay_7Kq2',method:'card',at:now()-45*864e5,amount:3380000,currency:'KRW',minor:3380000,provMinorRef:0},ago:1100}),
+  mk({id:'app_23995',room:'rm_701',guest:'Ana P.',country:{ko:'브라질',en:'Brazil'},in:iso(addD(D0,30)),out:iso(addM(addD(D0,30),3)),status:'confirmed',pay:{id:'pay_8Hd1',method:'paypal',at:now()-6*864e5,amount:5520000,currency:'USD',fx:USD,minor:Math.round(5520000/USD*100),provMinorRef:0},ago:200}),
+ ];
+ return {rooms,apps,trace:[{id:1,ts:now(),kind:'job',title:'boot',lines:'데모 데이터 준비 완료 · rooms 9, applications 5\nDemo data ready'}],unseen:0,seq:1};
+}
+let DB;
+try{DB=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){DB=null}
+if(!DB||!DB.rooms)DB=seed();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}};
+const S={lang:'ko',role:'guest',view:'search',room:null,f:{area:'all',movein:iso(addD(D0,21)),months:2,budget:0},m:'list',sel:null,htab:'apps',inS:null,outS:null,flash:false};
+try{const l=localStorage.getItem('stayfold_lang');if(l==='en'||l==='ko')S.lang=l}catch(e){}
+const t=k=>T[S.lang][k]??k;
+const L=o=>o[S.lang];
+const room=id=>DB.rooms.find(r=>r.id===id);
+const house=id=>HOUSES.find(h=>h.id===id);
+const BLOCK=['approved','paid','confirmed','partially_refunded'];
+const isActiveHold=a=>a.status==='approved'&&a.hold>now();
+function blocks(rid,except){return DB.apps.filter(a=>a.room===rid&&a.id!==except&&(a.status==='paid'||a.status==='confirmed'||a.status==='partially_refunded'||isActiveHold(a)))}
+const overlap=(a1,b1,a2,b2)=>a1<b2&&a2<b1;
+function check(r,inS,outS,except){
+ if(!inS||!outS)return t('errOrder');
+ if(pd(outS)<=pd(inS))return t('errOrder');
+ if(pd(inS)<pd(r.avail))return t('errAvail')+' '+fd(r.avail);
+ if(quote(r,inS,outS).m<1)return t('errMin');
+ if(blocks(r.id,except).some(a=>overlap(inS,outS,a.in,a.out)))return t('errOverlap');
+ return '';
+}
+
+/* ---------------- trace ---------------- */
+let tseq=DB.seq||1;
+function log(kind,title,lines){DB.trace.push({id:++tseq,ts:now(),kind,title,lines});DB.seq=tseq;if(DB.trace.length>120)DB.trace.splice(0,DB.trace.length-120);if(!document.body.classList.contains('trace-open'))DB.unseen=(DB.unseen||0)+1;save();renderTrace(true);renderTop()}
+function logSeq(items,gap=380){return new Promise(res=>{let i=0;const go=()=>{if(i>=items.length)return res();const [k,ti,l]=items[i++];log(k,ti,l);setTimeout(go,gap)};go()})}
+const idem=()=>'idem_'+Math.random().toString(36).slice(2,10);
+const kst=ms=>{const d=new Date(ms);return `${iso(d)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} KST`};
+
+/* ---------------- top / foot ---------------- */
+function renderTop(){
+ const role=[['guest',t('guest')],['host',t('host')],['sys',t('sys')]].map(([k,v])=>`<button data-act="role" data-v="${k}" aria-pressed="${S.role===k}">${v}</button>`).join('');
+ document.getElementById('top').innerHTML=`
+ <button class="logo" data-act="home" aria-label="Stayfold Seoul"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-9l7-6 7 6v9"/></svg></i>Stayfold<small>Seoul monthly rooms</small></button>
+ <span class="seg-lbl">${S.lang==='ko'?'데모 보기 전환':'Demo view'}</span><div class="seg role" role="group" aria-label="${S.lang==='ko'?'데모 보기 전환':'Demo view'}">${role}</div>
+ <div class="lang" role="group" aria-label="language"><button data-act="lang" data-v="ko" aria-pressed="${S.lang==='ko'}">KO</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==='en'}">EN</button></div>
+ <button class="trace-btn" data-act="trace" aria-label="${t('trace')}">${ic.term}<span class="lbl">${t('trace')}</span><span class="cnt">${DB.unseen||''}</span></button>`;
+ document.getElementById('foot').innerHTML=`<span>${t('credit')} · Stayfold Seoul은 제안용 가상 브랜드예요.</span><button class="link" data-act="reset">${t('resetDemo')}</button>`;
+ document.documentElement.lang=S.lang;
+}
+function renderTrace(isNew){
+ const el=document.getElementById('trace');
+ const legend=[['req','#6FA8FF','API'],['db','#5BD19B','DB'],['pg','#F27A98','PG'],['hook','#F7B955','Webhook'],['job','#B9A6FF','Job'],['err','#FF6B6B','Error']].map(([k,c,n])=>`<span><i style="background:${c}"></i>${n}</span>`).join('');
+ const evs=DB.trace.slice().reverse().map((e,i)=>`<div class="ev k-${e.kind}${isNew&&i===0?' new':''}"><div class="h"><span>${esc(e.title)}</span><time>${new Date(e.ts).toLocaleTimeString('en-GB')}</time></div><div class="l">${esc(e.lines)}</div></div>`).join('');
+ el.innerHTML=`<header><div><b>${t('traceT')}</b><span>${t('traceS')}</span></div><button class="x" data-act="trace" aria-label="${t('close')}">${ic.x}</button></header><div class="tlog">${evs}</div><div class="tlegend">${legend}</div>`;
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------------- map ---------------- */
+function mapSVG(){
+ const lab=(x,y,k,e,s=13)=>`<text x="${x}" y="${y}" font-size="${s}" fill="#7B867E" font-weight="600" text-anchor="middle">${S.lang==='ko'?k:e}</text>`;
+ return `<svg viewBox="0 0 600 470" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+ <rect width="600" height="470" fill="#ECEFE7"/>
+ <path d="M0 0H600V470H0Z" fill="#ECEFE7"/>
+ <g fill="#E2E7DC" stroke="#D3D9CD" stroke-width="1.2">
+  <path d="M60 60 L200 40 L250 120 L230 210 L140 250 L40 240Z"/>
+  <path d="M250 120 L330 60 L420 80 L400 190 L330 200 L270 190Z"/>
+  <path d="M420 80 L560 90 L580 220 L470 250 L400 190Z"/>
+  <path d="M230 210 L270 190 L330 200 L400 190 L380 290 L260 290Z"/>
+  <path d="M0 330 L250 310 L330 330 L380 400 L300 470 L0 470Z"/>
+  <path d="M330 330 L600 300 L600 470 L300 470 L380 400Z"/>
+ </g>
+ <ellipse cx="318" cy="222" rx="30" ry="18" fill="#D3E2CC"/>
+ <ellipse cx="402" cy="96" rx="34" ry="20" fill="#D3E2CC"/>
+ <g stroke="#FFFFFF" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9">
+  <path d="M40 170 C150 160 250 150 330 140 S500 130 580 150"/>
+  <path d="M300 20 L310 140 L300 260"/>
+  <path d="M120 60 C170 120 200 170 240 210"/>
+  <path d="M430 40 C440 120 450 180 470 250"/>
+ </g>
+ <path d="M-10 262 C70 262 120 268 170 276 C230 286 260 312 310 316 C360 320 395 290 445 282 C500 274 550 288 610 280" fill="none" stroke="#BFD5E2" stroke-width="26" stroke-linecap="round"/>
+ <ellipse cx="205" cy="290" rx="34" ry="9" fill="#E2E7DC" transform="rotate(10 205 290)"/>
+ ${lab(110,130,'마포구','Mapo')}${lab(300,100,'종로구','Jongno')}${lab(205,105,'서대문구','Seodaemun',12)}${lab(318,258,'용산구','Yongsan')}${lab(500,165,'성동구','Seongdong')}${lab(470,390,'강남구','Gangnam')}${lab(160,380,'영등포구','Yeongdeungpo',12)}
+ <text x="560" y="300" font-size="12" fill="#6E8FA3" font-weight="650" text-anchor="end" font-style="italic">${S.lang==='ko'?'한강':'Han River'}</text>
+ <text x="318" y="226" font-size="10.5" fill="#6F8A66" text-anchor="middle">${S.lang==='ko'?'남산':'Namsan'}</text>
+ </svg>`;
+}
+function pinsHTML(list,selId){
+ const byH={};list.forEach(r=>{(byH[r.h]=byH[r.h]||[]).push(r)});
+ const selH=selId&&room(selId)?room(selId).h:null;
+ return Object.entries(byH).map(([hid,rs])=>{const h=house(hid);rs.sort((a,b)=>a.rent-b.rent);const first=rs.find(r=>r.id===selId)||rs[0];return `<button class="pin${selH===hid?' on':''}" style="left:${h.x}%;top:${h.y}%" data-act="pin" data-id="${first.id}" data-h="${hid}" aria-label="${esc(L(h))} ${won(rs[0].rent)}">${short(rs[0].rent)}${rs.length>1?'<small> +'+(rs.length-1)+'</small>':''}</button>`}).join('');
+}
+function mapBox(list,selId,mini){
+ return `<div class="map" ${mini?'':'id="mainmap"'}>${mapSVG()}${pinsHTML(list,selId)}<div class="map-note"><span>${t('mapNote')}</span></div></div>`;
+}
+
+/* ---------------- guest: search ---------------- */
+function filtered(){
+ const f=S.f,out=iso(addM(pd(f.movein),f.months));
+ return DB.rooms.filter(r=>(f.area==='all'||house(r.h).area===f.area)&&(!f.budget||r.rent<=f.budget)&&!check(r,f.movein,out));
+}
+function roomCard(r){
+ const h=house(r.h),f=S.f,q=quote(r,f.movein,iso(addM(pd(f.movein),f.months)));
+ return `<button class="room${S.sel===r.id?' hl':''}" data-act="open" data-id="${r.id}" data-hover="${r.h}">
+  <div class="ph"><img src="${U(P[r.ph[0]])}" alt="${esc(L(r))}" loading="lazy"><span class="tagl">${L(AREAS[h.area])}</span><span class="tagr">${r.bath==='p'?t('privBath'):t('shareBath')}</span></div>
+  <h3>${esc(L(r))} · ${esc(L(h))}</h3>
+  <div class="meta">${S.lang==='ko'?`${fds(r.avail)}${t('from')}`:`${t('from')} ${fds(r.avail)}`} · ${r.size}${t('size')} · ${L(h.st)} ${S.lang==='ko'?t('walk')+' '+h.w+t('min'):h.w+t('min')}</div>
+  <div class="price"><b class="num">${won(r.rent)}</b> ${t('perMonth')} · ${t('deposit')} ${short(r.dep)}</div>
+  <div class="est num">${S.lang==='ko'?`${f.months}개월 숙박비(관리비 포함) ${won(q.stay)} · 보증금 별도`:`${f.months}-mo stay incl. fees ${won(q.stay)} · deposit extra`}</div>
+ </button>`;
+}
+function vSearch(){
+ const f=S.f,list=filtered();
+ const areaOpts=[['all',t('all')],...Object.entries(AREAS).map(([k,v])=>[k,L(v)])].map(([k,v])=>`<option value="${k}" ${f.area===k?'selected':''}>${v}</option>`).join('');
+ const mOpts=[1,2,3,4,6,12].map(n=>`<option value="${n}" ${f.months===n?'selected':''}>${n}${t('m')}</option>`).join('');
+ const bOpts=[[0,t('any')],[900000],[1100000],[1300000],[1500000]].map(([v,l])=>`<option value="${v}" ${f.budget===v?'selected':''}>${l||won(v)+' '+t('upto')}</option>`).join('');
+ const sel=list.find(r=>r.id===S.sel)||list[0];
+ return `<div class="wrap">
+ ${gnav()}
+ <section class="hero"><div><h1>${t('heroH')}</h1><p>${t('heroP')}</p></div><p class="rule-note">${t('ruleNote')}</p></section>
+ <form class="search" data-form="search" onsubmit="return false">
+  <div class="fld"><label for="f-area">${t('area')}</label><select id="f-area" data-f="area">${areaOpts}</select></div>
+  <div class="fld"><label for="f-in">${t('movein')}</label><input id="f-in" type="date" data-f="movein" value="${f.movein}" min="${iso(D0)}"></div>
+  <div class="fld"><label for="f-m">${t('months')}</label><select id="f-m" data-f="months">${mOpts}</select></div>
+  <div class="fld"><label for="f-b">${t('budget')}</label><select id="f-b" data-f="budget">${bOpts}</select></div>
+  <button class="go" data-act="search" type="button">${ic.search}${t('searchBtn')}</button>
+ </form>
+ <div class="res-head"><div><h2>${t('matching')} <span class="num">${list.length}</span></h2><span class="mut">${fd(f.movein)} – ${fd(addM(pd(f.movein),f.months))} · ${f.months}${t('m')}</span></div>
+  <div class="seg mob-switch" role="group"><button data-act="mview" data-v="list" aria-pressed="${S.m==='list'}">${t('listV')}</button><button data-act="mview" data-v="map" aria-pressed="${S.m==='map'}">${t('mapV')}</button></div></div>
+ <div class="split" data-m="${S.m}">
+  <div class="list">${list.length?list.map(roomCard).join(''):`<div class="empty"><b>${t('emptyH')}</b>${t('emptyP')}<div style="margin-top:14px"><button class="btn line sm" data-act="resetf">${t('reset')}</button></div></div>`}</div>
+  <div class="mapcol">${mapBox(list,sel&&sel.id)}${sel?`<div class="map-peek">${peek(sel)}</div>`:''}</div>
+ </div></div>`;
+}
+function peek(r){const h=house(r.h);return `<button class="peek" data-act="open" data-id="${r.id}"><img src="${U(P[r.ph[0]])}" alt=""><div><b>${esc(L(r))} · ${esc(L(h))}</b><span>${won(r.rent)} ${t('perMonth')} · ${t('deposit')} ${won(r.dep)}</span></div></button>`}
+function gnav(){const n=DB.apps.filter(a=>a.mine&&a.status==='approved').length;return `<nav class="gnav"><button class="tab" data-act="gview" data-v="search" aria-current="${S.view!=='trips'}">${t('find')}</button><button class="tab" data-act="gview" data-v="trips" aria-current="${S.view==='trips'}">${t('trips')}${n?`<span class="b">${n}</span>`:''}</button></nav>`}
+
+/* ---------------- guest: detail ---------------- */
+function vDetail(){
+ const r=room(S.room),h=house(r.h);
+ if(!S.inS){S.inS=pd(S.f.movein)<pd(r.avail)?r.avail:S.f.movein;S.outS=iso(addM(pd(S.inS),S.f.months))}
+ const err=check(r,S.inS,S.outS),q=quote(r,S.inS,S.outS);
+ const imgs=r.ph.map(k=>U(P[k]));
+ const desc=DESC[r.id]||defDesc;
+ // timeline 6 months
+ const t0=D0,t1=addM(D0,6),span=dd(t0,t1),pc=(d)=>Math.max(0,Math.min(100,dd(t0,pd(d))/span*100));
+ const bl=[{in:iso(D0),out:r.avail,k:'b'},...blocks(r.id).map(a=>({in:a.in,out:a.out,k:a.status==='approved'?'hold':'b'}))].filter(b=>pd(b.out)>t0);
+ const tl=`<div class="tl-bar">${bl.map(b=>`<div class="blk${b.k==='hold'?' hold':''}" style="left:${pc(b.in)}%;width:${pc(b.out)-pc(b.in)}%"></div>`).join('')}<div class="sel" style="left:${pc(S.inS)}%;width:${Math.max(1,pc(S.outS)-pc(S.inS))}%"></div></div>
+  <div class="tl-ax">${[0,1,2,3,4,5,6].map(i=>`<span>${S.lang==='ko'?(addM(D0,i).getMonth()+1)+'월':addM(D0,i).toLocaleDateString('en-US',{month:'short'})}</span>`).join('')}</div>
+  <div class="legend"><span><i style="background:var(--ok-bg);border:1px solid #BFE6D2"></i>${t('lgFree')}</span><span><i style="background:#D3D7CF"></i>${t('lgBooked')}</span><span><i style="background:#F7D88A"></i>${t('lgHold')}</span><span><i style="border:2px solid var(--brand)"></i>${t('lgSel')}</span></div>`;
+ const chips=[1,2,3,6].map(n=>{const on=q.d===0&&q.m===n;return `<button class="chip" data-act="dur" data-v="${n}" aria-pressed="${on}">${n}${t('m')}</button>`}).join('')+`<button class="chip" data-act="plusd" aria-pressed="${q.d>0}">+10${t('days')}</button>`;
+ const fl=S.flash?' flash':'';
+ const rc=err?`<div class="err" role="alert">${esc(err)}</div>`:`<div class="rcpt">
+  <div class="rl${fl}"><span>${t('rent')} ${won(r.rent)} × ${q.m}${t('m')}</span><b class="num">${won(q.rentM)}</b></div>
+  ${q.d?`<div class="rl${fl}"><span>${t('rent')} ${S.lang==='ko'?'일할':'prorated'} ${q.d}${t('days')}<span class="f">${won(r.rent)} ÷ 30 × ${q.d}${S.lang==='ko'?' (100원 반올림)':' (rounded to ₩100)'}</span></span><b class="num">${won(q.rentD)}</b></div>`:''}
+  <div class="rl${fl}"><span>${t('fee')} ${won(r.fee)} × ${q.m}${t('m')}${q.d?` + ${q.d}${t('days')}`:''}${q.d?`<span class="f">${won(r.fee)} ÷ 30 × ${q.d} = ${won(q.feeD)}</span>`:''}</span><b class="num">${won(q.feeM+q.feeD)}</b></div>
+  <div class="rl"><span>${t('stayTot')}</span><b class="num">${won(q.stay)}</b></div>
+  <div class="rl dep"><span>${t('dep2')}</span><span class="num">${won(q.dep)}</span></div>
+  <div class="rl tot${fl}"><span>${t('dueAfter')}</span><span class="num">${won(q.due)}</span></div>
+  <div class="usd">≈ $${Math.round(q.due/USD).toLocaleString('en-US')} USD (${S.lang==='ko'?'예시 환율':'sample rate'} ₩${USD.toLocaleString()})</div></div>`;
+ S.flash=false;
+ return `<div class="wrap">
+ <button class="back" data-act="gview" data-v="search">${ic.back}${t('back')}</button>
+ <div class="gal-wrap"><div class="gal" id="gal">${imgs.map((u,i)=>`<img src="${u}" alt="${esc(L(r))} ${i+1}" ${i?'loading="lazy"':''}>`).join('')}</div><span class="gal-cnt" id="galcnt">1 / ${imgs.length}</span></div>
+ <div class="det">
+  <div>
+   <h1>${esc(L(r))} · ${esc(L(h))}</h1>
+   <div class="sub">${L(AREAS[h.area])} · ${L(h.st)} ${S.lang==='ko'?'도보 '+h.w+'분':h.w+' min walk'}</div>
+   <div class="facts"><span>${ic.size}${r.size}${t('size')}</span><span>${ic.bath}${r.bath==='p'?t('privBath'):t('shareBath')}</span><span>${ic.bed}${r.fl}${t('floor')}</span><span>${ic.people}${S.lang==='ko'?h.mates+t('housemates'):h.mates+t('housemates')}</span></div>
+   <div class="sec"><h2>${t('about')}</h2><p>${L(desc)}</p></div>
+   <div class="sec"><h2>${t('amenH')}</h2><ul class="amen">${r.am.map(a=>`<li>${ic[a]}${L(AMEN[a])}</li>`).join('')}</ul></div>
+   <div class="sec"><h2>${t('availH')}</h2><p style="margin-bottom:12px">${S.lang==='ko'?`${fd(r.avail)}부터 입주할 수 있어요. 최소 1개월, 이후는 일 단위로 늘릴 수 있어요.`:`Move in from ${fd(r.avail)}. Minimum 1 month, then extend by the day.`}</p>${tl}</div>
+   <div class="sec minimap"><h2>${t('where')}</h2>${mapBox([r],r.id,true)}</div>
+  </div>
+  <aside class="book" id="book">
+   <div class="p1 num">${won(r.rent)} <small>${t('perMonth')}</small></div>
+   <div class="usd">${t('deposit')} ${won(r.dep)} · ${t('fee')} ${won(r.fee)}</div>
+   <div class="dates"><div class="fld"><label for="d-in">${t('movein')}</label><input id="d-in" type="date" data-d="in" value="${S.inS}" min="${r.avail}"></div><div class="fld"><label for="d-out">${t('moveout')}</label><input id="d-out" type="date" data-d="out" value="${S.outS}" min="${S.inS}"></div></div>
+   <div class="chips">${chips}</div>
+   ${rc}
+   <button class="btn brand full" style="margin-top:16px" data-act="apply" ${err?'disabled':''}>${t('apply')}</button>
+   <p class="hint">${t('applyHint')}</p>
+  </aside>
+ </div></div>
+ <div class="mbar"><div><b class="num">${err?'—':won(q.due)}</b><span>${err?esc(err):t('dueAfter')+' · '+q.m+t('m')+(q.d?' + '+q.d+t('days'):'')}</span></div><button class="btn brand" data-act="apply" ${err?'disabled':''}>${t('applyShort')}</button></div>`;
+}
+
+/* ---------------- guest: trips ---------------- */
+const curQ=a=>a.rate?quote(a.rate,a.in,a.out):a.q;
+const steps=s=>{const lv={pending:1,approved:2,expired:2,rejected:1,paid:3,confirmed:4,refunded:4,partially_refunded:4}[s];return `<div class="steps">${['st1','st2','st3','st4'].map((k,i)=>`<div class="${i<lv?'on':''}">${t(k)}</div>`).join('')}</div>`};
+const cd=ms=>{const s=Math.max(0,Math.floor(ms/1000));return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,'0')).join(':')};
+function vTrips(){
+ const mine=DB.apps.filter(a=>a.mine).sort((a,b)=>b.created-a.created);
+ const body=mine.length?mine.map(a=>{const r=room(a.room),h=house(r.h);let box='';
+  if(a.status==='pending')box=`<div class="box"><p>${t('pendBox')}</p><button class="btn line sm" data-act="tohost">${t('tryHost')}</button></div>`;
+  if(a.status==='approved')box=`<div class="box warn"><div class="acts" style="justify-content:space-between"><div><div class="cd" data-cd="${a.hold}">${cd(a.hold-now())}</div><p style="margin:2px 0 10px">${t('holdBox')}</p></div></div><div class="acts"><button class="btn brand sm" data-act="pay" data-id="${a.id}" data-m="card">${t('payCard')}</button><button class="btn line sm" data-act="pay" data-id="${a.id}" data-m="paypal">${t('payPal')}</button><button class="link" data-act="ff" data-id="${a.id}">${t('ff')}</button></div></div>`;
+  if(a.status==='confirmed'||a.status==='paid')box=`<div class="box ok"><p>${t('confBox')}</p><div class="cell num">${t('paidWith')} ${won(a.pay.amount)} · ${a.pay.method==='paypal'?'PayPal':'Card'} · ${a.pay.id}</div></div>`;
+  if(a.status==='refunded'||a.status==='partially_refunded')box=`<div class="box"><div class="cell num">${t('paidWith')} ${won(a.pay.amount)} · ${t('refundedAmt')} ${won(a.refunded)}</div></div>`;
+  if(a.status==='expired')box=`<div class="box"><p>${t('expBox')}</p><button class="btn line sm" data-act="open" data-id="${a.room}">${t('reapply')}</button></div>`;
+  if(a.status==='rejected')box=`<div class="box"><p>${t('rejBox')}</p></div>`;
+  return `<article class="trip"><img src="${U(P[r.ph[0]])}" alt=""><div><div class="row1"><div><h3>${esc(L(r))} · ${esc(L(h))}</h3><div class="d num">${fd(a.in)} – ${fd(a.out)} · ${curQ(a).m}${t('m')}${curQ(a).d?' + '+curQ(a).d+t('days'):''} · ${won(a.pay?a.pay.amount:a.q.due)}${a.amended?(S.lang==='ko'?' · 퇴실일 변경됨':' · move-out changed'):''}</div></div><span class="st ${a.status}">${t('s_'+a.status)}</span></div>${steps(a.status)}${box}</div></article>`}).join('')
+ :`<div class="empty"><b>${t('noTrips')}</b>${t('noTripsP')}<div style="margin-top:14px"><button class="btn brand sm" data-act="gview" data-v="search">${t('goFind')}</button></div></div>`;
+ return `<div class="wrap">${gnav()}<div class="trips">${body}</div></div>`;
+}
+
+/* ---------------- host ---------------- */
+function vHost(){
+ const pend=DB.apps.filter(a=>a.status==='pending'),hold=DB.apps.filter(a=>isActiveHold(a)),live=DB.apps.filter(a=>['paid','confirmed','partially_refunded'].includes(a.status));
+ const tabs=[['apps',t('tApps'),pend.length],['rooms',t('tRooms'),0],['ten',t('tTen'),0]].map(([k,v,n])=>`<button class="tab" data-act="htab" data-v="${k}" aria-current="${S.htab===k}">${v}${n?`<span class="b">${n}</span>`:''}</button>`).join('');
+ let body='';
+ if(S.htab==='apps'){
+  const rows=[...pend,...hold].sort((a,b)=>b.created-a.created).map(a=>{const r=room(a.room),h=house(r.h);
+   const conflict=a.status==='pending'&&blocks(a.room,a.id).some(b=>overlap(a.in,a.out,b.in,b.out));
+   const acts=a.status==='pending'?`<div class="acts"><button class="btn sm" data-act="approve" data-id="${a.id}" ${conflict?'disabled':''}>${t('approve')}</button><button class="btn line sm" data-act="reject" data-id="${a.id}">${t('reject')}</button></div>`
+    :`<div class="acts"><div><span class="st approved">${t('s_approved')}</span><div class="cd" style="font-size:17px;margin-top:4px" data-cd="${a.hold}">${cd(a.hold-now())}</div></div></div>`;
+   return `<div class="prow"><div class="who"><b>${esc(a.guest)}${a.mine?' ·  '+(S.lang==='ko'?'방금 신청':'just now'):''}</b><span>${L(a.country)} · ${esc(a.id)}</span></div><div class="cell"><b>${esc(L(r))}</b><br><span>${esc(L(h))}</span></div><div class="cell num">${fds(a.in)} – ${fds(a.out)}<br><span>${a.q.m}${t('m')}${a.q.d?' + '+a.q.d+t('days'):''} · ${won(a.q.due)}</span></div>${acts}${a.msg?`<div class="msg">"${esc(a.msg)}"</div>`:''}${conflict?`<div class="conflict">${t('conflictMsg')}</div>`:''}</div>`}).join('');
+  body=`<div class="panel">${rows||`<div class="empty" style="border:0"><b>${t('noApps')}</b>${t('noAppsP')}</div>`}</div>`;
+ }
+ if(S.htab==='rooms'){
+  body=HOUSES.map(h=>{const rs=DB.rooms.filter(r=>r.h===h.id);return `<div class="panel"><div class="ph-h"><b>${esc(L(h))}</b><span>${L(AREAS[h.area])} · ${rs.length}${t('rooms')}</span></div>${rs.map(r=>{
+   const st=DB.apps.some(a=>a.room===r.id&&['paid','confirmed','partially_refunded'].includes(a.status)&&pd(a.in)<=D0&&pd(a.out)>D0)?'live':DB.apps.some(a=>a.room===r.id&&isActiveHold(a))?'hold':'free';
+   const cls={free:'confirmed',hold:'approved',live:'refunded'}[st];
+   return `<div class="rrow" data-room="${r.id}"><div class="rhead"><img src="${U(P[r.ph[0]])}" alt=""><div><b>${esc(L(r))}</b><br><span class="st ${cls}" style="margin-top:4px">${t('r_'+st)}</span></div></div>
+   <div><label for="rent-${r.id}">${t('rent')}</label><input class="in num" id="rent-${r.id}" inputmode="numeric" data-k="rent" value="${r.rent}"></div>
+   <div><label for="dep-${r.id}">${t('deposit')}</label><input class="in num" id="dep-${r.id}" inputmode="numeric" data-k="dep" value="${r.dep}"></div>
+   <div><label for="fee-${r.id}">${t('fee')}</label><input class="in num" id="fee-${r.id}" inputmode="numeric" data-k="fee" value="${r.fee}"></div>
+   <div><label for="av-${r.id}">${t('availFrom')}</label><input class="in" type="date" id="av-${r.id}" data-k="avail" value="${r.avail}"></div>
+   <div class="acts"><button class="btn line sm" data-act="saveroom" data-id="${r.id}">${t('save')}</button></div></div>`}).join('')}</div>`}).join('');
+ }
+ if(S.htab==='ten'){
+  const all=DB.apps.filter(a=>['paid','confirmed','partially_refunded','refunded'].includes(a.status));
+  body=`<div class="panel">${all.length?all.map(a=>{const r=room(a.room),h=house(r.h);const left=a.pay.amount-a.refunded;
+   return `<div class="prow"><div class="who"><b>${esc(a.guest)}</b><span>${L(a.country)} · ${esc(L(r))}, ${esc(L(h))}</span></div><div class="cell num">${fd(a.in)} – ${fd(a.out)}<br><span>${curQ(a).m}${t('m')}${curQ(a).d?' + '+curQ(a).d+t('days'):''}${a.amended?(S.lang==='ko'?' · 조기 퇴실':' · early out'):''}</span></div><div class="cell num">${t('paid')} ${won(a.pay.amount)}<br><span>${a.pay.method==='paypal'?'PayPal':'Card'}${a.refunded?` · ${t('refundedAmt')} ${won(a.refunded)}`:''}</span></div>
+   <div class="acts">${a.status==='refunded'?`<span class="st refunded">${t('s_refunded')}</span>`:`<span class="st ${a.status}">${t('s_'+a.status)}</span><button class="btn line sm" data-act="refund" data-id="${a.id}" ${left<=0?'disabled':''}>${t('partial')}</button><button class="btn line sm" data-act="cancel" data-id="${a.id}">${t('cancelAll')}</button>`}</div></div>`}).join(''):`<div class="empty" style="border:0"><b>${t('noTen')}</b></div>`}</div>`;
+ }
+ return `<div class="wrap"><div class="host-head"><div><h1>${t('hostH')}</h1><p>${t('hostP')} <span style="color:var(--mut)">· Mapo Stay Co. (${S.lang==='ko'?'예시':'sample'}) · ${S.lang==='ko'?'실서비스에선 호스트 로그인 후 본인 숙소만 보여요':'live site: hosts sign in and see only their own houses'}</span></p></div><div class="kpis"><div><b class="num">${pend.length}</b>${t('kNew')}</div><div><b class="num">${hold.length}</b>${t('kHold')}</div><div><b class="num">${live.length}</b>${t('kLive')}</div></div></div><nav class="htabs">${tabs}</nav>${body}</div>`;
+}
+
+/* ---------------- system (under the hood) ---------------- */
+function vSys(){
+ const c=s=>DB.apps.filter(a=>s.includes(a.status)).length;
+ const nPay=DB.apps.filter(a=>a.pay).length,nRef=DB.trace.filter(e=>e.title.includes('/refunds')).length,nHook=DB.trace.filter(e=>e.kind==='hook').length;
+ const tbl=(name,rows,cnt,cx)=>`<div class="tbl"><header>${name}<span>${cnt!=null?(cnt+' rows · demo'):''}</span></header>${rows.map(([k,ty,cl])=>`<div class="${cl||''}"><span>${k}</span><i>${ty}</i></div>`).join('')}</div>`;
+ const node=(x,y,w,label,sub,n,kind)=>{const fill={g:'#E3F6ED',y:'#FFF3D4',n:'#F0F2F5',b:'#EAF2FF',r:'#FCEDF1',d:'#18201C'}[kind];const tc=kind==='d'?'#fff':'#18201C';return `<g><rect x="${x}" y="${y}" width="${w}" height="58" rx="14" fill="${fill}" stroke="${kind==='d'?'#18201C':'#D9DED6'}"/><text x="${x+w/2}" y="${y+25}" text-anchor="middle" font-size="15" font-weight="700" fill="${tc}" font-family="ui-monospace,Menlo,monospace">${label}</text><text x="${x+w/2}" y="${y+44}" text-anchor="middle" font-size="12" fill="${kind==='d'?'#C9D0CB':'#5F6A63'}">${sub} · ${n}</text></g>`};
+ const ar=(d,l,lx,ly)=>`<path d="${d}" fill="none" stroke="#8A948D" stroke-width="1.6" marker-end="url(#ah)"/>${l?`<text x="${lx}" y="${ly}" font-size="11.5" fill="#5F6A63" text-anchor="middle">${l}</text>`:''}`;
+ const sm=`<svg viewBox="0 0 1000 330" role="img" aria-label="결제 상태 흐름"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8A948D"/></marker></defs>
+  ${node(20,40,150,'pending','승인 대기',c(['pending']),'n')}
+  ${node(240,40,170,'approved','24시간 확보',DB.apps.filter(isActiveHold).length,'y')}
+  ${node(480,40,140,'paid','결제 확인',c(['paid']),'g')}
+  ${node(690,40,160,'confirmed','예약 확정',c(['confirmed']),'d')}
+  ${node(20,200,150,'rejected','거절',c(['rejected']),'n')}
+  ${node(240,200,170,'expired','만료·방 다시 열림',c(['expired']),'n')}
+  ${node(600,200,190,'partially_refunded','부분 환불',c(['partially_refunded']),'b')}
+  ${node(830,200,150,'refunded','전액 환불',c(['refunded']),'b')}
+  ${ar('M170 69 H236','호스트 승인',203,60)}
+  ${ar('M410 69 H476','PG 승인 응답',443,60)}
+  ${ar('M620 69 H686','PG 조회 확인',653,60)}
+  ${ar('M95 98 V196','호스트 거절',140,150)}
+  ${ar('M325 98 V196','24h 지남',368,150)}
+  ${ar('M760 98 C760 150 700 160 698 196','',0,0)}
+  ${ar('M800 98 C840 150 900 160 902 196','',0,0)}
+  ${ar('M790 229 H826','',0,0)}
+  <text x="805" y="150" font-size="11.5" fill="#5F6A63" text-anchor="middle">조기 퇴실·취소</text>
+  <text x="500" y="300" font-size="12.5" fill="#B4264A" text-anchor="middle">결제가 확보 만료 뒤에 끝나면 확정하지 않고 자동 취소해요. (데모에선 한 줄 상태로 보이지만, 실제 DB는 신청·예약·결제·환불 상태를 나눠 저장)</text>
+ </svg>`;
+ return `<div class="wrap sys">
+ ${S.lang==='en'?'<p class="lead" style="margin:0 0 12px">This page is a technical note for the client and is written in Korean only. The guest and host screens switch fully to English.</p>':''}
+ <h1>시제품 화면은 살리고, 돈과 방이 걸린 판단은 서버로 옮깁니다</h1>
+ <p class="lead">대표님이 만든 시제품의 화면 흐름과 가격·예약 규칙을 최대한 살리고, 그 아래에 실제 DB·결제·지도·서버를 넣는 방식이에요. 어디까지 그대로 쓰고 어디를 고칠지는 첫 주에 코드를 진단한 뒤 함께 정해요. 지금 이 데모에서 누르는 버튼마다 오른쪽 '서버 로그'에 실서비스라면 일어날 일이 찍혀요.</p>
+
+ <h2>어디까지 유지하고, 무엇을 새로 넣나</h2>
+ <p>점선은 지금 있는 시제품, 검은 띠가 새로 만드는 핵심이에요.</p>
+ <div class="layers">
+  <div class="ly keep"><div class="ly-k"><b>시제품 화면 (최대한 유지)</b><span>코드 진단 후 범위 확정 · 오류 수정 + 어색한 UI 정돈</span></div><div class="ly-v"><span>방 단위 검색</span><span>다국어 전환</span><span>날짜·옵션 선택</span><span>예약 흐름</span><span>호스트 입주자 화면</span></div></div>
+  <div class="ly core"><div class="ly-k"><b>API 서버 (새로)</b><span>브라우저가 아닌 서버가 결정</span></div><div class="ly-v"><span>회원·로그인</span><span>가격 계산 다시 검증</span><span>신청·승인·24시간 확보</span><span>결제 확인(웹훅)</span><span>환불·부분 환불</span><span>호스트 권한</span></div></div>
+  <div class="ly"><div class="ly-k"><b>DB (새로)</b><span>브라우저 임시 저장 → PostgreSQL</span></div><div class="ly-v"><span>계정</span><span>집 → 방</span><span>요금·보증금·입주 가능일</span><span>신청·예약</span><span>결제·환불 기록</span></div></div>
+  <div class="ly"><div class="ly-k"><b>외부 연동</b><span>계약·키는 대표님 명의</span></div><div class="ly-v"><span>지도 API</span><span>해외카드 PG</span><span>PayPal</span><span>메일 알림</span></div></div>
+  <div class="ly"><div class="ly-k"><b>운영</b><span>런칭 후 유지보수</span></div><div class="ly-v"><span>도메인·HTTPS</span><span>자동 백업</span><span>오류 알림</span><span>배포 기록·되돌리기</span><span>월간 점검 보고</span></div></div>
+ </div>
+
+ <h2>DB 설계 초안</h2>
+ <p>시제품의 화면 하나하나가 어느 표를 읽고 쓰는지 맞춰서 정해요. 분홍 줄이 겹치는 예약을 DB가 직접 막는 규칙이에요. 24시간 확보와 확정 예약을 room_blocks 한 표에 같이 넣고, 결제가 확정되면 같은 트랜잭션에서 hold를 booking으로 바꿔요. (숫자는 지금 이 데모 안의 행 수)</p>
+ <div class="er">
+  <div class="er-col"><em>사람과 숙소</em>
+   ${tbl('users',[['id','uuid','pk'],['role','guest | host | admin'],['email','text'],['lang','ko | en'],['country','text']],null)}
+   ${tbl('homes',[['id','uuid','pk'],['host_id','→ users','fk'],['name_ko / name_en','text'],['lat, lng','지도 좌표'],['address','text']],HOUSES.length)}
+   ${tbl('rooms',[['id','uuid','pk'],['home_id','→ homes','fk'],['monthly_rent','int (원)'],['deposit','int'],['maint_fee','int'],['available_from','date']],DB.rooms.length)}
+  </div>
+  <div class="er-col"><em>신청과 예약</em>
+   ${tbl('applications',[['id','uuid','pk'],['room_id','→ rooms','fk'],['guest_id','→ users','fk'],['stay','daterange'],['price_snapshot','jsonb (월할·일할 내역)'],['status','pending | approved | rejected | expired'],['hold_expires_at','timestamptz'],['price_snapshot_rate','jsonb (월세·관리비·보증금)']],DB.apps.length)}
+   ${tbl('room_blocks',[['room_id','→ rooms','fk'],['stay','daterange'],['kind','hold | booking'],['expires_at','hold일 때만'],['EXCLUDE USING gist (room_id =, stay &&)','확보·확정 모두 한 표에서 겹침 금지','cx']],DB.apps.filter(a=>isActiveHold(a)||['paid','confirmed','partially_refunded'].includes(a.status)).length)}
+   ${tbl('bookings',[['id','uuid','pk'],['application_id','→ applications','fk'],['stay','daterange (조기 퇴실 시 변경)'],['status','confirmed | partially_refunded | refunded']],DB.apps.filter(a=>a.pay).length)}
+   ${tbl('status_history',[['application_id','→ applications','fk'],['from → to','text'],['actor','guest | host | system'],['at','timestamptz']],null)}
+  </div>
+  <div class="er-col"><em>돈</em>
+   ${tbl('payments',[['id','uuid','pk'],['application_id','→ applications','fk'],['provider','card | paypal'],['provider_key','unique'],['amount_krw','int (스냅샷)'],['currency','KRW | USD'],['provider_amount_minor','int (USD는 센트)'],['provider_refunded_minor','int'],['fx_rate_snapshot','numeric'],['idempotency_key','unique'],['status','ready → paid | failed | canceled']],nPay)}
+   ${tbl('refunds',[['id','uuid','pk'],['payment_id','→ payments','fk'],['amount_krw','int'],['provider_amount','numeric + currency'],['reason','early_out | deposit | cancel'],['status','pending | succeeded | failed'],['provider_refund_id, idempotency_key','unique'],['succeeded만 누적 · 결제 행 잠금 후 합계 검사','트랜잭션','cx']],nRef||0)}
+   ${tbl('webhook_events',[['(provider, event_id)','unique (중복 무시)','pk'],['provider','text'],['verified_by','signature | 조회 API'],['payload','jsonb']],nHook)}
+  </div>
+ </div>
+
+ <h2>결제 상태 흐름</h2>
+ <p>상자 안 숫자는 지금 데모 데이터의 건수예요. 게스트·호스트 화면에서 눌러 보면 바뀌어요. <span class="mob-only">(옆으로 밀어서 보기)</span></p>
+ <div class="sm-wrap">${sm}</div>
+
+ <h2>돈과 방이 걸린 곳에서 꼭 지키는 규칙</h2>
+ <p>바이브 코딩 시제품에서 가장 자주 비는 부분이라, 처음부터 서버 쪽에 넣어요.</p>
+ <ul class="rules">
+  <li>${ic.shield}<div><b>24시간은 서버 시계로</b><span>hold_expires_at을 DB에 두고 만료 작업이 1분마다 확인해요. 브라우저 타이머는 보여 주기만 해요.</span></div></li>
+  <li>${ic.shield}<div><b>같은 방 이중 예약은 DB가 막음</b><span>확보(hold)와 확정(booking)을 한 표(room_blocks)에 넣고 PostgreSQL 겹침 금지 제약을 걸어서, 동시에 눌러도 한 건만 들어가요.</span></div></li>
+  <li>${ic.shield}<div><b>금액은 서버가 정함</b><span>화면이 보낸 금액은 믿지 않아요. 신청 때 서버가 월할·일할을 계산해 스냅샷으로 저장하고, 승인 뒤 호스트가 요금을 바꿔도 그 금액으로 청구해요.</span></div></li>
+  <li>${ic.shield}<div><b>확정은 서버가 PG에 직접 확인한 뒤</b><span>결제 완료 화면이 아니라, 서버가 PG 승인 API 응답과 결제 조회로 금액·상태를 확인한 뒤 확정해요. 웹훅은 늦게 오거나 두 번 와도 한 번만 반영해요. 검증 방식은 PG마다 달라서 연동 문서대로 맞춰요.</span></div></li>
+  <li>${ic.shield}<div><b>환불은 누적 한도 안에서</b><span>결제 행을 잠근 트랜잭션 안에서 '이미 환불한 합계 + 이번 금액 ≤ 결제액'을 확인해요. 결제 당시 금액·통화·환율 스냅샷은 바꾸지 않고, 사유·처리자·PG 응답을 남겨요.</span></div></li>
+  <li>${ic.shield}<div><b>모든 상태 변경을 기록</b><span>누가 언제 무엇을 바꿨는지 남겨서, 런칭 후 문의가 오면 그대로 따라가 볼 수 있어요.</span></div></li>
+ </ul>
+
+ <h2>카드·PayPal을 어디로 받을지</h2>
+ <p>2026년 10월 공식 문서 기준으로 확인한 내용이에요. 숙박·단기임대 업종 심사는 PG사마다 달라서 계약 전에 꼭 물어봐야 해요.</p>
+ <div class="pg-wrap"><table class="pg"><thead><tr><th>선택지</th><th>해외 카드</th><th>PayPal</th><th>메모</th></tr></thead><tbody>
+  <tr><td>토스페이먼츠</td><td><span class="tag ok">지원</span> 추가 계약 + 카드사 심사(영업일 10~14일)</td><td><span class="tag ok">지원</span> USD 승인, 별도 계약</td><td>KRW 계약과 USD 계약이 나뉨. 부분취소 범위·숙박업 심사 <span class="tag">확인 필요</span></td></tr>
+  <tr><td>포트원 V2</td><td>연결한 PG에 따름</td><td><span class="tag ok">지원</span> PayPal 버튼 방식</td><td>여러 PG를 한 코드로 관리. 계약·정산은 각 PG와 따로</td></tr>
+  <tr><td>PayPal 직접</td><td>PayPal 안 카드 결제 범위 <span class="tag">확인 필요</span></td><td><span class="tag ok">가능</span></td><td>수수료·환전·분쟁을 따로 운영해야 함</td></tr>
+  <tr><td>Stripe</td><td colspan="2"><span class="tag no">어려움</span> 지원 국가 목록에 한국이 없음</td><td>해외 법인이 있다면 별도 검토</td></tr>
+ </tbody></table></div>
+
+ <h2>검수 때 함께 눌러 볼 시나리오</h2>
+ <p>테스트 결제(PG 테스트 키)로 아래를 하나씩 재현해서 보여 드리고 납품해요.</p>
+ <div class="tests">
+  <div class="test">${ic.check}<div><b>같은 방, 같은 기간 두 명 승인</b><span>한 명만 확보되고 다른 한 명은 '기간 겹침'으로 막힘</span></div></div>
+  <div class="test">${ic.check}<div><b>24시간이 지난 뒤 결제 시도</b><span>결제 버튼이 닫히고, 늦게 온 웹훅은 자동 환불</span></div></div>
+  <div class="test">${ic.check}<div><b>웹훅 두 번 도착</b><span>event_id가 같으면 두 번째는 무시</span></div></div>
+  <div class="test">${ic.check}<div><b>조기 퇴실 부분 환불 두 번</b><span>합계가 결제액을 넘으면 거절</span></div></div>
+  <div class="test">${ic.check}<div><b>해외 카드 부분 취소</b><span>환율 차이로 체감 환불액이 다를 수 있다는 안내 문구 확인</span></div></div>
+  <div class="test">${ic.check}<div><b>영어로 처음부터 끝까지</b><span>검색 → 신청 → 결제 → 내 예약까지 한국어가 섞이지 않는지</span></div></div>
+ </div>
+
+
+ <h2>진행 방식과 넘겨 드리는 것</h2>
+ <p>선정 후 바로 시작해 30~45일 안에 오픈하는 것을 목표로 잡은 예시 일정이에요. 첫 미팅에서 함께 확정해요.</p>
+ <div class="pg-wrap"><table class="pg"><thead><tr><th>기간</th><th>하는 일</th><th>대표님이 확인할 것</th></tr></thead><tbody>
+  <tr><td>1주</td><td>시제품 코드·규칙 진단, 재사용 범위 결정, DB 설계서 초안, PG·지도 계정 준비 안내</td><td>가격·취소·환불 규칙 확정</td></tr>
+  <tr><td>2주</td><td>회원·집·방·신청·승인(24시간 확보) 서버와 DB 연결, 시제품 오류 수정</td><td>미리보기 주소에서 신청·승인 눌러 보기</td></tr>
+  <tr><td>3주</td><td>지도 API, 카드·PayPal 테스트 결제, 환불·부분 환불, 메일 알림</td><td>테스트 결제·환불 직접 해 보기</td></tr>
+  <tr><td>4주~</td><td>검수 시나리오 전부 재현, 도메인 연결, 배포, 운영 안내</td><td>최종 검수 후 오픈</td></tr>
+ </tbody></table></div>
+ <ul class="rules" style="margin-top:18px">
+  <li>${ic.check}<div><b>넘겨 드리는 것</b><span>상용 소스 전체(대표님 저장소), DB 설계 문서, API 목록, 배포된 서버와 계정, 운영 안내서</span></div></li>
+  <li>${ic.check}<div><b>런칭 뒤</b><span>월 단위 유지보수: 오류 수정, 백업·오류 알림 확인, 작은 수정, 월간 점검 보고. 응답 시간과 범위는 미팅에서 정해요.</span></div></li>
+ </ul>
+ <h2>기술 스택 (시제품 코드를 본 뒤 확정)</h2>
+ <p>시제품이 React 계열이면 화면 코드는 그대로 두고 아래를 붙이는 게 가장 빨라요.</p>
+ <div class="stack">
+  <div><b>화면</b><span>기존 시제품</span><small>오류 수정, 다국어 키 정리</small></div>
+  <div><b>서버·DB</b><span>TypeScript + PostgreSQL</span><small>Supabase 등 관리형 DB, 자동 백업</small></div>
+  <div><b>결제·지도</b><span>PG + PayPal · 지도 API</span><small>대표님 명의 계약, 키는 서버에만</small></div>
+  <div><b>호스팅</b><span>Vercel 등 + 도메인</span><small>미리보기 주소로 검수 후 배포</small></div>
+ </div>
+ </div>`;
+}
+
+/* ---------------- render ---------------- */
+function render(keepScroll){
+ const y=window.scrollY;
+ renderTop();
+ const app=document.getElementById('app');
+ if(S.role==='guest')app.innerHTML=S.view==='detail'?vDetail():S.view==='trips'?vTrips():vSearch();
+ else if(S.role==='host')app.innerHTML=vHost();
+ else app.innerHTML=vSys();
+ if(keepScroll)window.scrollTo(0,y);
+ const g=document.getElementById('gal');
+ if(g)g.addEventListener('scroll',()=>{const n=Math.round(g.scrollLeft/g.clientWidth)+1;const c=document.getElementById('galcnt');if(c)c.textContent=n+' / '+g.children.length},{passive:true});
+}
+function go(patch,keep){Object.assign(S,patch);render(keep);if(!keep)window.scrollTo(0,0)}
+
+/* ---------------- toast / modal ---------------- */
+let tt;
+function toast(msg,withLog){
+ clearTimeout(tt);const l=document.getElementById('layer');
+ const el=document.createElement('div');el.className='toast';el.setAttribute('role','status');
+ el.innerHTML=`<span>${esc(msg)}</span>${withLog&&!document.body.classList.contains('trace-open')?`<button data-act="trace">${t('seeLog')}</button>`:''}`;
+ document.querySelectorAll('.toast').forEach(x=>x.remove());document.body.appendChild(el);
+ tt=setTimeout(()=>el.remove(),4200);
+}
+function modal(html){document.querySelectorAll('.toast').forEach(x=>x.remove());document.getElementById('layer').innerHTML=`<div class="ov" data-act="ovclose"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;const f=document.querySelector('.sheet button,.sheet input');if(f)f.focus()}
+const closeModal=()=>{document.getElementById('layer').innerHTML=''};
+const wide=()=>window.matchMedia('(min-width:1180px)').matches;
+function openTrace(force){if(force===false){document.body.classList.remove('trace-open');renderTop();return}
+ document.body.classList.add('trace-open');DB.unseen=0;save();renderTrace();renderTop();}
+
+/* ---------------- actions ---------------- */
+function apply(){
+ const r=room(S.room),err=check(r,S.inS,S.outS);if(err)return;
+ const q=quote(r,S.inS,S.outS),id='app_'+(24100+Math.floor(Math.random()*800));
+ DB.apps.push({id,room:r.id,guest:'Sophie R.',country:{ko:'캐나다',en:'Canada'},in:S.inS,out:S.outS,q,rate:{rent:r.rent,fee:r.fee,dep:r.dep},status:'pending',msg:S.lang==='ko'?'안녕하세요, 연구 교류로 서울에 머물러요.':'Hi! I am in Seoul for a research exchange.',created:now(),hold:null,pay:null,refunded:0,mine:true});
+ save();
+ logSeq([
+  ['req','POST /api/applications',`room_id=${r.id}  stay=[${S.inS}, ${S.outS})\nlang=${S.lang}  guest=usr_sophie`],
+  ['db','INSERT applications',`${id}  status=pending\nprice_snapshot: ${q.m}mo × ${r.rent} + ${q.d}d × ${r.rent}/30\n  rent=${q.rentM+q.rentD} fee=${q.feeM+q.feeD} deposit=${q.dep}\n  total_due=${q.due}  (서버에서 다시 계산)`],
+  ['job','notify host','email → host@mapostay (example)\n"새 입주 신청 1건"']
+ ]);
+ S.inS=null;go({view:'trips'});toast(t('toastApplied'),true);if(wide())openTrace();
+}
+function approve(id){
+ const a=DB.apps.find(x=>x.id===id);
+ if(blocks(a.room,a.id).some(b=>overlap(a.in,a.out,b.in,b.out))){log('err','PATCH /api/applications/'+id+'/approve','409 Conflict\nroom_blocks EXCLUDE 제약 위반\n같은 방·겹치는 기간에 확보된 예약이 있어 거부');toast(t('conflictMsg'));render(true);return}
+ a.status='approved';a.hold=now()+24*3600e3;save();
+ logSeq([
+  ['req','PATCH /api/applications/'+id+'/approve','actor=host  role check ok'],
+  ['db','BEGIN · UPDATE applications',`${id}  pending → approved\nhold_expires_at = ${kst(a.hold)}\nINSERT room_blocks kind=hold → EXCLUDE 겹침 없음\nCOMMIT`],
+  ['job','notify guest',`email → ${a.guest}\n"24시간 안에 결제하면 확정돼요" + 결제 링크`]
+ ]);
+ render(true);toast(t('toastApproved'),true);if(wide())openTrace();
+}
+function reject(id){const a=DB.apps.find(x=>x.id===id);a.status='rejected';save();log('req','PATCH /api/applications/'+id+'/reject',`${id}  pending → rejected\n결제 없음 · 게스트에게 안내 메일`);render(true)}
+function ff(id){const a=DB.apps.find(x=>x.id===id);a.hold=now()+6000;save();log('job','demo: clock +24h',`${id} hold_expires_at → ${S.lang==='ko'?'6초 뒤':'in 6 s'}`);render(true)}
+function tick(){
+ let changed=false;
+ DB.apps.forEach(a=>{if(a.status==='approved'&&a.hold<=now()){a.status='expired';changed=true;log('job','cron: expire-holds',`${a.id}  approved → expired\nroom ${a.room} 다시 열림 · 결제 링크 무효화`)}});
+ if(changed){save();if(!document.querySelector('.ov'))render(true)}
+ document.querySelectorAll('[data-cd]').forEach(el=>{el.textContent=cd(+el.dataset.cd-now())});
+}
+function payModal(id,m){
+ const a=DB.apps.find(x=>x.id===id),r=room(a.room);
+ const draw=(method,stage,fail)=>{
+  const usd=Math.round(a.q.due/USD*100)/100;
+  modal(`<button class="x" data-act="close" aria-label="${t('close')}">${ic.x}</button><h3>${t('payTitle')}</h3>
+  <div class="mut" style="color:var(--mut);font-size:14px;margin-top:4px">${esc(L(r))} · ${fd(a.in)} – ${fd(a.out)}</div>
+  <div class="mock-note">${t('mockNote')}</div>
+  <div class="rl"><span>${t('amount')}</span><b class="num">${won(a.q.due)}${method==='paypal'?` <span style="color:var(--mut);font-weight:500">≈ $${usd.toLocaleString('en-US')}</span>`:''}</b></div>
+  <div class="paym" role="group"><button data-act="pm" data-id="${id}" data-m="card" aria-pressed="${method==='card'}" ${stage?'disabled':''}>${t('card')}<small>${t('cardS')}</small></button><button data-act="pm" data-id="${id}" data-m="paypal" aria-pressed="${method==='paypal'}" ${stage?'disabled':''}>${t('pp')}<small>${t('ppS')}</small></button></div>
+  ${method==='card'?`<div class="fakecard"><div><span>${S.lang==='ko'?'카드 번호':'Card number'}</span><code>PG 결제창에서 입력</code></div><div><span>3-D Secure</span><code>${S.lang==='ko'?'카드사 인증':'Issuer check'}</code></div></div>`:`<div class="fakecard"><div><span>PayPal</span><code>${S.lang==='ko'?'PayPal 창에서 로그인·승인':'Approve in PayPal window'}</code></div><div><span>${S.lang==='ko'?'통화':'Currency'}</span><code>USD (${S.lang==='ko'?'예시 환율':'sample rate'} ₩${USD.toLocaleString()})</code></div></div>`}
+  ${fail?`<div class="err">${t(fail===true?'failMsg':fail)}</div>`:''}
+  ${stage?`<ul class="prog">${['p1','p2','p3','p4'].map((k,i)=>`<li class="${i<stage-1?'done':i===stage-1?'run':''}"><i>${i<stage-1?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>':''}</i>${t(k)}</li>`).join('')}</ul>`
+   :`<button class="btn brand full" style="margin-top:16px" data-act="paygo" data-id="${id}" data-m="${method}">${t('payNow')}</button><div style="text-align:center"><button class="link" data-act="payfail" data-id="${id}" data-m="${method}">${t('payFail')}</button></div>`}`);
+ };
+ payModal.draw=draw;draw(m);
+}
+async function payGo(id,m){
+ const a=DB.apps.find(x=>x.id===id),r=room(a.room);
+ if(!isActiveHold(a)){closeModal();render(true);return}
+ const d=payModal.draw,key=idem(),pid='pay_'+Math.random().toString(36).slice(2,6);
+ const q=a.q,cur=m==='paypal'?'USD':'KRW',amt=m==='paypal'?(q.due/USD).toFixed(2):q.due;
+ const changed=r.rent!==a.rate.rent||r.fee!==a.rate.fee||r.dep!==a.rate.dep;
+ d(m,1);await logSeq([['req','POST /api/payments',`application=${id}  method=${m}\nIdempotency-Key: ${key}\n승인 당시 price_snapshot으로 청구: ${q.due} KRW\n${changed?'호스트가 승인 뒤 요금을 바꿨지만 스냅샷 금액 유지':'현재 요금과 스냅샷 일치'}\nhold valid until ${kst(a.hold)}`]]);
+ d(m,2);await logSeq(m==='card'?[['pg','PG 결제창 → successUrl','paymentKey, orderId, amount 수신\n서버: amount가 스냅샷과 같은지 검사'],['pg','POST PG 결제 승인 API',`provider_key=${pid}  amount=${amt} ${cur}\n3DS: authenticated · 응답 status=DONE`]]
+  :[['pg','PayPal 버튼 승인 → 서버 capture',`provider_key=${pid}  amount=${amt} USD (환율 스냅샷 ₩${USD})\ncapture 응답: COMPLETED (PENDING이면 웹훅·조회로 대기)`]],500);
+ d(m,3);await logSeq([['hook','PG 상태 교차 확인',`GET 결제 조회 API → ${m==='card'?'DONE':'COMPLETED'} 일치\n웹훅 수신 시 event_id 중복 무시 (정합성 보완)`]],500);
+ // 확정 트랜잭션: 행 잠금 후 확보 유효성 재검사
+ if(!isActiveHold(a)){
+  a.status='expired';a.pay={id:pid,method:m,at:now(),amount:q.due,currency:cur,fx:USD,minor:m==='paypal'?Math.round(q.due/USD*100):q.due,provMinorRef:0,state:'cancel_pending'};save();
+  await logSeq([['err','BEGIN · SELECT … FOR UPDATE',`${id} hold_expires_at 지남 → 확정하지 않음\npayments.status = cancel_pending · 취소 작업 큐 등록`],['pg','PG 결제 취소 요청 (자동)',`${pid} cancel_amount=${amt} ${cur}`],['db','PG 응답 성공 → 반영',`payments.status cancel_pending → canceled\nrefunds INSERT status=succeeded\n(실패하면 재시도 + 운영자 알림)`]]);
+  a.refunded=q.due;a.pay.provMinorRef=a.pay.minor;a.pay.state='canceled';save();
+  d(m,0,'lateMsg');return;
+ }
+ a.status='confirmed';a.pay={id:pid,method:m,at:now(),amount:q.due,currency:cur,fx:USD,minor:m==='paypal'?Math.round(q.due/USD*100):q.due,provMinorRef:0};save();
+ d(m,4);await logSeq([['db','BEGIN · 확정 트랜잭션',`SELECT … FOR UPDATE ${id}\nstatus=approved AND hold_expires_at > now() 확인\npayments INSERT (${pid}, ${q.due} KRW, provider_amount ${amt} ${cur})\nroom_blocks hold → booking 전환 · bookings INSERT confirmed\nstatus_history +2\nCOMMIT`],['job','notify','email → guest: 예약 확정 영수증\nemail → host: 입주 예정 1건']],450);
+ d(m,5);
+ setTimeout(()=>{closeModal();render(true);toast(t('toastPaid'),true)},700);
+}
+function payFail(id,m){const key=idem();log('req','POST /api/payments',`application=${id}  method=${m}\nIdempotency-Key: ${key}`);log('err','PG decline',`code=CARD_DECLINED (example)\npayments: status=failed · application stays approved\nhold 유지 — 다시 결제 가능`);payModal.draw(m,0,true)}
+function refundModal(id,mode){
+ const a=DB.apps.find(x=>x.id===id),r=a.rate,left=a.pay.amount-a.refunded;
+ mode=mode||'early';
+ let amt=0,extra='';
+ if(mode==='early'){const m1=addM(pd(a.in),1),tm=addD(D0,1);const minOut=iso(m1>tm?m1:tm);if(minOut>=a.out){mode='dep';return refundModal(id,'dep')}const no=refundModal.no&&refundModal.no>=minOut&&refundModal.no<a.out?refundModal.no:(iso(addD(pd(a.out),-10))>minOut?iso(addD(pd(a.out),-10)):minOut);refundModal.no=no;const cq=quote(r,a.in,a.out),nq=quote(r,a.in,no);amt=Math.max(0,cq.stay-nq.stay);
+  extra=`<div class="dates" style="grid-template-columns:1fr"><div class="fld"><label for="r-out">${t('newOut')}</label><input id="r-out" type="date" data-ro="${id}" value="${no}" min="${minOut}" max="${a.out}"></div></div>
+  <div class="rcpt"><div class="rl"><span>${S.lang==='ko'?'지금':'Current'} ${fds(a.in)}–${fds(a.out)}</span><span class="num">${won(cq.stay)}</span></div><div class="rl"><span>${S.lang==='ko'?'바뀐':'New'} ${fds(a.in)}–${fds(no)} (${nq.m}${t('m')}${nq.d?' + '+nq.d+t('days'):''})</span><span class="num">${won(nq.stay)}</span></div><div class="rl tot"><span>${t('refundAmt')}</span><span class="num">${won(amt)}</span></div></div>`}
+ if(mode==='dep'){amt=a.rate.dep;extra=`<div class="rcpt"><div class="rl tot"><span>${t('refundAmt')}</span><span class="num">${won(amt)}</span></div></div>`}
+ if(mode==='custom'){amt=refundModal.ca||0;extra=`<div style="margin-top:12px"><label for="r-amt" style="font-size:13px;font-weight:600;color:var(--mut)">${t('refundAmt')}</label><input class="in num" id="r-amt" inputmode="numeric" data-ra="${id}" value="${amt||''}" placeholder="0" style="min-height:48px;font-size:16px"></div>`}
+ const over=amt>left;
+ modal(`<button class="x" data-act="close" aria-label="${t('close')}">${ic.x}</button><h3>${t('refundT')} · ${esc(a.guest)}</h3>
+ <div style="color:var(--mut);font-size:14px;margin-top:4px">${esc(L(room(a.room)))} · ${t('paid')} ${won(a.pay.amount)} · ${t('refundMax')} <b class="num" style="color:var(--ink)">${won(left)}</b></div>
+ <div class="chips" style="margin-top:14px">${[['early',t('refundEarly')],['dep',t('refundDep')],['custom',t('refundCustom')]].map(([k,v])=>`<button class="chip" data-act="rmode" data-id="${id}" data-v="${k}" aria-pressed="${mode===k}">${v}</button>`).join('')}</div>
+ ${extra}
+ ${over?`<div class="err">${t('refundErr')}</div>`:''}
+ <div class="mock-note" style="margin-bottom:0">${S.lang==='ko'?'해외 카드 부분 취소는 환율 때문에 게스트가 받는 금액이 조금 다를 수 있어요. 안내 문구에 포함해요.':'Partial refunds on foreign cards may differ slightly due to exchange rates. Guests are told this up front.'}</div>
+ <button class="btn full" style="margin-top:14px" data-act="refundgo" data-id="${id}" data-v="${mode}" data-amt="${amt}" ${over||amt<=0?'disabled':''}>${t('refundGo')} · ${won(amt)}</button>`);
+ refundModal.mode=mode;
+}
+async function doRefund(id,amt,mode,full){
+ const a=DB.apps.find(x=>x.id===id);const key=idem(),left=a.pay.amount-a.refunded;
+ if(amt>left){log('err','POST /api/payments/'+a.pay.id+'/refunds',`422 refund exceeds remaining ${left}`);return}
+ closeModal();
+ const provLeft=a.pay.minor-(a.pay.provMinorRef||0);const provMinor=a.pay.currency==='USD'?((full||amt>=left)?provLeft:Math.min(provLeft,Math.round(amt/a.pay.fx*100))):amt;
+ await logSeq([['req',`POST /api/payments/${a.pay.id}/refunds`,`amount_krw=${amt}  reason=${full?'cancel':mode==='early'?'early_out':mode==='dep'?'deposit':'manual'}\nIdempotency-Key: ${key}\nSELECT … FOR UPDATE (결제 행 잠금) · status=succeeded 환불만 합산\nrefunded ${a.refunded} + ${amt} ≤ captured ${a.pay.amount} ok`],['pg',`PG ${full?'cancel':'partial cancel'} · ${a.pay.method==='paypal'?'PayPal':'Card'}`,`provider_key=${a.pay.id}  cancel_amount=${a.pay.currency==='USD'?(provMinor/100).toFixed(2)+' USD ('+(full?'남은 승인 잔액 그대로':'센트 정수로 계산, 잔액 초과 불가')+')':amt+' KRW'}\nrefunds INSERT status=pending → PG 성공 응답 후 succeeded\nstatus=${full?'CANCELED':'PARTIAL_CANCELED'}`],['hook','PG 상태 조회 / 웹훅 refund','GET /payments/{key} 로 취소 상태 교차 확인\nevent_id 중복 아님 · 저장']],420);
+ const prev=a.status;a.refunded+=amt;a.pay.provMinorRef=(a.pay.provMinorRef||0)+provMinor;
+ if(mode==='early'&&!full&&refundModal.no){a.out=refundModal.no;a.amended=true;} /* 결제 당시 price_snapshot(a.q)은 절대 바꾸지 않음 */
+ a.status=a.refunded>=a.pay.amount||full?'refunded':'partially_refunded';
+ 
+ save();
+ log('db','INSERT refunds · UPDATE applications',`${a.id}  ${prev} → ${a.status}\nrefunded total=${a.refunded}${mode==='early'&&!full?`\nstay → [${a.in}, ${a.out}) · 남은 날 방 다시 열림`:''}${full?'\n방 달력 다시 열림':''}`);
+ render(true);toast(S.lang==='ko'?`${won(amt)} 모의 환불 완료`:`Mock refund of ${won(amt)} done`,true);if(wide())openTrace();
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const act=b.dataset.act,v=b.dataset.v,id=b.dataset.id;
+ if(act==='ovclose'&&e.target!==b)return;
+ switch(act){
+  case 'home':go({role:'guest',view:'search'});break;
+  case 'role':go({role:v,view:v==='guest'?'search':S.view});break;
+  case 'lang':S.lang=v;try{localStorage.setItem('stayfold_lang',v)}catch(_){}render(true);renderTrace();break;
+  case 'trace':document.body.classList.contains('trace-open')?openTrace(false):openTrace();document.querySelectorAll('.toast').forEach(x=>x.remove());break;
+  case 'gview':S.inS=null;go({view:v});break;
+  case 'search':go({},true);document.querySelector('.res-head')?.scrollIntoView({behavior:'smooth',block:'start'});break;
+  case 'resetf':S.f={area:'all',movein:iso(addD(D0,21)),months:2,budget:0};render(true);break;
+  case 'mview':go({m:v},true);break;
+  case 'open':S.inS=null;go({view:'detail',room:id,role:'guest'});break;
+  case 'pin':if(S.view==='detail')break;S.sel=id;render(true);break;
+  case 'dur':S.outS=iso(addM(pd(S.inS),+v));S.flash=true;render(true);break;
+  case 'plusd':{const q=quote(room(S.room),S.inS,S.outS);S.outS=iso(addD(addM(pd(S.inS),Math.max(1,q.m)),10));S.flash=true;render(true);break}
+  case 'apply':apply();break;
+  case 'tohost':go({role:'host',htab:'apps'});break;
+  case 'htab':go({htab:v},true);break;
+  case 'approve':approve(id);break;
+  case 'reject':reject(id);break;
+  case 'ff':ff(id);break;
+  case 'pay':payModal(id,b.dataset.m);break;
+  case 'pm':payModal.draw(b.dataset.m);break;
+  case 'paygo':payGo(id,b.dataset.m);break;
+  case 'payfail':payFail(id,b.dataset.m);break;
+  case 'close':case 'ovclose':closeModal();break;
+  case 'saveroom':{const row=b.closest('.rrow'),r=room(id),ch=[];row.querySelectorAll('[data-k]').forEach(i=>{const k=i.dataset.k;let val=k==='avail'?i.value:parseInt(String(i.value).replace(/\D/g,''),10)||0;if(r[k]!==val){ch.push(`${k}: ${r[k]} → ${val}`);r[k]=val}});save();log('req','PATCH /api/rooms/'+id,ch.length?ch.join('\n')+'\n검색·상세 화면 가격 즉시 반영':'no changes');toast(t('saved'),true);break}
+  case 'refund':refundModal.no=null;refundModal.ca=0;refundModal(id,'early');break;
+  case 'rmode':refundModal(id,v);break;
+  case 'refundgo':doRefund(id,+b.dataset.amt,v,false);break;
+  case 'cancel':{const a=DB.apps.find(x=>x.id===id);modal(`<button class="x" data-act="close" aria-label="${t('close')}">${ic.x}</button><h3>${t('cancelAll')} · ${esc(a.guest)}</h3><p style="color:var(--ink-2)">${t('cancelQ')}</p><div class="rl tot"><span>${t('refundAmt')}</span><span class="num">${won(a.pay.amount-a.refunded)}</span></div><button class="btn full" style="margin-top:14px" data-act="cancelgo" data-id="${id}">${t('cancelGo')}</button>`);break}
+  case 'cancelgo':{const a=DB.apps.find(x=>x.id===id);doRefund(id,a.pay.amount-a.refunded,'cancel',true);break}
+  case 'reset':try{localStorage.removeItem(KEY)}catch(_){}DB=seed();tseq=1;S.inS=null;go({role:'guest',view:'search',sel:null});renderTrace();break;
+ }
+});
+document.addEventListener('change',e=>{
+ const el=e.target;
+ if(el.dataset.f){const k=el.dataset.f;S.f[k]=k==='months'||k==='budget'?+el.value:el.value;if(k==='movein'&&!el.value)S.f.movein=iso(addD(D0,21));S.sel=null;render(true)}
+ if(el.dataset.d){if(!el.value)return;if(el.dataset.d==='in'){const q=quote(room(S.room),S.inS,S.outS);S.inS=el.value;S.outS=iso(addD(addM(pd(el.value),Math.max(1,q.m)),q.d))}else S.outS=el.value;S.flash=true;render(true)}
+ if(el.dataset.ro){refundModal.no=el.value;refundModal(el.dataset.ro,'early')}
+ if(el.dataset.ra){refundModal.ca=parseInt(el.value.replace(/\D/g,''),10)||0;refundModal(el.dataset.ra,'custom');const i=document.getElementById('r-amt');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+});
+document.addEventListener('mouseover',e=>{const c=e.target.closest('[data-hover]');if(!c)return;document.querySelectorAll('.pin').forEach(p=>p.classList.toggle('on',p.dataset.h===c.dataset.hover))});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(document.querySelector('.ov'))closeModal();else if(document.body.classList.contains('trace-open'))openTrace(false)}});
+
+render();renderTrace();
+setInterval(tick,1000);
+window.__S=S;window.__DB=()=>DB;
+})();
+</script>
+</body>
+</html>
