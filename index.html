@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Stayfold Seoul — 한 달 살기 방 예약 (제안용 데모)</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2096%2096%22%20role%3D%22img%22%20aria-labelledby%3D%22title%22%3E%20%20%3Ctitle%20id%3D%22title%22%3EStayfold%20folded%20linen%20mark%3C/title%3E%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22%232A1D1A%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%20%20%20%20%3Cpath%20d%3D%22M25%2018h34c8%200%2014%206%2014%2014v35c0%206-5%2011-11%2011H36c-7%200-13-6-13-13V29c0-6%205-11%2011-11%22/%3E%20%20%20%20%3Cpath%20d%3D%22M25%2055c10%200%2017%202%2023%207%207%206%2014%208%2024%206%22/%3E%20%20%20%20%3Cpath%20d%3D%22M60%2018v17c0%205%204%209%209%209h4%22/%3E%20%20%3C/g%3E%20%20%3Ccircle%20cx%3D%2231%22%20cy%3D%2227%22%20r%3D%222.2%22%20fill%3D%22%232A1D1A%22/%3E%3C/svg%3E">
+<link rel="icon" href="data:,">
 <meta name="description" content="외국인 대상 서울 한 달 살기 방 단위 예약 웹 MVP 제안용 데모. 방 검색, 지도, 월할·일할 가격, 호스트 승인 24시간 확보, 카드·PayPal 모의 결제, 환불까지.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
@@ -1003,7 +1003,7 @@ const kst=ms=>{const d=new Date(ms);return `${iso(d)} ${String(d.getHours()).pad
 function renderTop(){
  const role=[['guest',t('guest')],['host',t('host')],['sys',t('sys')]].map(([k,v])=>`<button data-act="role" data-v="${k}" aria-pressed="${S.role===k}">${v}</button>`).join('');
  document.getElementById('top').innerHTML=`
- <button class="logo" data-act="home" aria-label="Stayfold Seoul"><i><svg viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M25 18h34c8 0 14 6 14 14v35c0 6-5 11-11 11H36c-7 0-13-6-13-13V29c0-6 5-11 11-11"/><path d="M25 55c10 0 17 2 23 7 7 6 14 8 24 6"/><path d="M60 18v17c0 5 4 9 9 9h4"/></g><circle cx="31" cy="27" r="3.4" fill="currentColor"/></svg></i>Stayfold</button>
+ <button class="logo" data-act="home" aria-label="Stayfold Seoul">Stayfold</button>
   <div class="lang" role="group" aria-label="language"><button data-act="lang" data-v="ko" aria-pressed="${S.lang==='ko'}">KO</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==='en'}">EN</button></div>
  <button class="trace-btn" data-act="trace" aria-label="${t('trace')}">${ic.term}<span class="cnt">${DB.unseen||''}</span></button>`;
  document.getElementById('rolebar').innerHTML=`<span class="db-l">${S.lang==='ko'?'화면 보기':'View as'}</span><div class="seg role" role="group" aria-label="${S.lang==='ko'?'데모 화면 전환':'Demo view'}">${role}</div>`;
